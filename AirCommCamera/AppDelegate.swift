@@ -16,6 +16,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
+        // 一時フォルダ作成. @memo tmpではないとNG
+        FileManager.createRootFolder("tmp")
+        FileManager.createSubFolder("airimage")
+        FileManager.createSubFolder("airmovie")
+        FileManager.createSubFolder("airshow")
+        
         return true
     }
 

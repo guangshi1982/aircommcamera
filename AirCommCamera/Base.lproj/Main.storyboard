@@ -1,25 +1,253 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6211" systemVersion="14A298i" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14E46" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="WIv-5l-gon">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6204"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
-        <scene sceneID="ufC-wZ-h7g">
+        <!--AirShowCollectionViewController-->
+        <scene sceneID="bcZ-wF-8TL">
             <objects>
-                <viewController id="vXZ-lx-hvc" customClass="ViewController" customModuleProvider="target" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="jyV-Pf-zRb"/>
-                        <viewControllerLayoutGuide type="bottom" id="2fi-mo-0CV"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
+                <collectionViewController title="AirShowCollectionViewController" id="WeD-cj-6Td" customClass="AirShowCollectionViewController" customModule="AirCommCamera" customModuleProvider="target" sceneMemberID="viewController">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="lcu-fX-9gB">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="C5n-jl-YCo">
+                            <size key="itemSize" width="108" height="108"/>
+                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        </collectionViewFlowLayout>
+                        <cells>
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="AirShowCell" id="Hh8-8i-nVn" customClass="AirShowCollectionViewCell" customModule="AirCommCamera" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                    <rect key="frame" x="0.0" y="0.0" width="108" height="108"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1lS-Ye-TAN">
+                                            <rect key="frame" x="0.0" y="0.0" width="108" height="108"/>
+                                        </imageView>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
+                                <size key="customSize" width="108" height="108"/>
+                                <connections>
+                                    <outlet property="thumbnailImageView" destination="1lS-Ye-TAN" id="Vap-TM-FB7"/>
+                                    <segue destination="5Qh-Da-y5V" kind="show" identifier="AirShowPlayer" id="1o8-CI-OKp"/>
+                                </connections>
+                            </collectionViewCell>
+                        </cells>
+                        <connections>
+                            <outlet property="dataSource" destination="WeD-cj-6Td" id="TSQ-02-94F"/>
+                            <outlet property="delegate" destination="WeD-cj-6Td" id="zCV-a1-TxH"/>
+                        </connections>
+                    </collectionView>
+                    <navigationItem key="navigationItem" title="AirShow" id="r8f-MN-Q8l">
+                        <barButtonItem key="leftBarButtonItem" systemItem="organize" id="VmD-jr-dTJ">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <connections>
+                                <action selector="selectFolder:" destination="WeD-cj-6Td" id="otb-hS-IZl"/>
+                                <segue destination="RTk-pF-8t7" kind="show" id="2OX-1I-BkN"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" systemItem="camera" id="TqN-LF-ex5">
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <connections>
+                                <action selector="airshowAction:" destination="WeD-cj-6Td" id="psL-a5-AXl"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5Vl-uJ-zwY" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="1914.5" y="-343.5"/>
+        </scene>
+        <!--Air Show Player View Controller-->
+        <scene sceneID="IVe-ae-YGg">
+            <objects>
+                <viewController id="5Qh-Da-y5V" customClass="AirShowPlayerViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="cqx-Ne-dzU"/>
+                        <viewControllerLayoutGuide type="bottom" id="h0j-Ve-FyY"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="h32-RP-V6C">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vSn-qd-wnN" customClass="AirShowPlayerView">
+                                <rect key="frame" x="0.0" y="64" width="375" height="256"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VzV-EC-eyG">
+                                        <rect key="frame" x="165" y="117" width="44" height="22"/>
+                                        <state key="normal" title="Play"/>
+                                        <connections>
+                                            <action selector="play:" destination="5Qh-Da-y5V" eventType="touchUpInside" id="akU-Zd-R3W"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <outlet property="playButton" destination="VzV-EC-eyG" id="kCR-6l-IFk"/>
+                        <outlet property="playerView" destination="vSn-qd-wnN" id="bjA-Nw-nKw"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="hlg-ip-zEG" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1914.5" y="502.5"/>
+        </scene>
+        <!--AirFolderCollectionViewController-->
+        <scene sceneID="X54-M2-gel">
+            <objects>
+                <collectionViewController title="AirFolderCollectionViewController" id="RTk-pF-8t7" customClass="AirFolderCollectionViewController" customModule="AirCommCamera" customModuleProvider="target" sceneMemberID="viewController">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="RWA-d9-8L9">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="sQF-Nd-Fcf">
+                            <size key="itemSize" width="108" height="108"/>
+                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        </collectionViewFlowLayout>
+                        <cells>
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="AirFolderCell" id="cB6-Aw-jb3" customClass="AirFolderCollectionViewCell" customModule="AirCommCamera" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                    <rect key="frame" x="0.0" y="0.0" width="108" height="108"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="e0h-fP-uJT">
+                                            <rect key="frame" x="0.0" y="0.0" width="108" height="108"/>
+                                        </imageView>
+                                    </subviews>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
+                                <size key="customSize" width="108" height="108"/>
+                                <connections>
+                                    <outlet property="folderImageView" destination="e0h-fP-uJT" id="Izn-wK-e7x"/>
+                                    <segue destination="eEN-2T-kjG" kind="show" id="AE8-1G-TXo"/>
+                                </connections>
+                            </collectionViewCell>
+                        </cells>
+                        <connections>
+                            <outlet property="dataSource" destination="RTk-pF-8t7" id="GY4-0d-Hn5"/>
+                            <outlet property="delegate" destination="RTk-pF-8t7" id="bSP-Rx-Fxe"/>
+                        </connections>
+                    </collectionView>
+                    <navigationItem key="navigationItem" id="le4-Vl-RMK"/>
+                </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="sbi-Ja-1dc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2436.5" y="-343.5"/>
+        </scene>
+        <!--Air Image Collection View Controller-->
+        <scene sceneID="8yZ-wX-U0w">
+            <objects>
+                <collectionViewController id="eEN-2T-kjG" customClass="AirImageCollectionViewController" customModule="AirCommCamera" customModuleProvider="target" sceneMemberID="viewController">
+                    <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="SOt-pP-YEc">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="0vc-14-qcH">
+                            <size key="itemSize" width="50" height="50"/>
+                            <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                            <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                            <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        </collectionViewFlowLayout>
+                        <cells>
+                            <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="9aH-9A-WPF">
+                                <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                                    <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                </view>
+                            </collectionViewCell>
+                        </cells>
+                        <connections>
+                            <outlet property="dataSource" destination="eEN-2T-kjG" id="2if-UX-PRq"/>
+                            <outlet property="delegate" destination="eEN-2T-kjG" id="nBN-ds-1vL"/>
+                        </connections>
+                    </collectionView>
+                </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="OAn-f2-PKU" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2900.5" y="-343.5"/>
+        </scene>
+        <!--AirShow-->
+        <scene sceneID="hkL-pn-q2o">
+            <objects>
+                <navigationController title="AirShow" automaticallyAdjustsScrollViewInsets="NO" id="4hY-ju-9Wo" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Show" id="T1E-nl-1cL"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="FBS-8A-RWH">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="barTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="WeD-cj-6Td" kind="relationship" relationship="rootViewController" id="Uzb-QF-sQw"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="vwY-lc-fqY" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1322.5" y="-343.5"/>
+        </scene>
+        <!--AirCamera-->
+        <scene sceneID="2Cz-cx-x9T">
+            <objects>
+                <viewController title="AirCamera" id="RAv-63-WG3" customClass="AirCameraViewController" customModule="AirCommCamera" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="gKc-ej-Bar"/>
+                        <viewControllerLayoutGuide type="bottom" id="lVB-C7-qUQ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="4PK-ff-mSV">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eA4-xA-T0U">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Camera" id="6nc-3e-Zr3" userLabel="Camera"/>
+                    <navigationItem key="navigationItem" id="4FN-eA-lqV"/>
+                    <connections>
+                        <outlet property="captureImageView" destination="eA4-xA-T0U" id="di2-S7-bV6"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="13F-XY-VjE" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="738.5" y="464.5"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="42S-hy-4Xb">
+            <objects>
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="WIv-5l-gon" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" id="vlj-LC-gwm">
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <color key="barTintColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="4hY-ju-9Wo" kind="relationship" relationship="viewControllers" id="3ho-Wa-zp5"/>
+                        <segue destination="RAv-63-WG3" kind="relationship" relationship="viewControllers" id="BwR-VW-Haf"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gqH-zu-Jnu" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="739" y="-343"/>
         </scene>
     </scenes>
 </document>

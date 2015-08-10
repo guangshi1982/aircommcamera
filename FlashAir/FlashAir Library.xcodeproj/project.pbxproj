@@ -1,0 +1,78 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXFileReference section */
+		8B1894DD1847210D00F80247 /* FAFlashAir.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FAFlashAir.h; sourceTree = "<group>"; };
+		8B1894DE1847210D00F80247 /* FAFlashAir.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FAFlashAir.m; sourceTree = "<group>"; };
+		8B2AD8471856C75600D1D238 /* FAItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FAItem.h; sourceTree = "<group>"; };
+		8B2AD8481856C75600D1D238 /* FAItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FAItem.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		8B1894D61847204C00F80247 = {
+			isa = PBXGroup;
+			children = (
+				8B2AD8471856C75600D1D238 /* FAItem.h */,
+				8B2AD8481856C75600D1D238 /* FAItem.m */,
+				8B1894DD1847210D00F80247 /* FAFlashAir.h */,
+				8B1894DE1847210D00F80247 /* FAFlashAir.m */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		8B1894D71847204C00F80247 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0500;
+			};
+			buildConfigurationList = 8B1894DA1847204C00F80247 /* Build configuration list for PBXProject "FlashAir Library" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 8B1894D61847204C00F80247;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		8B1894DB1847204C00F80247 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Debug;
+		};
+		8B1894DC1847204C00F80247 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8B1894DA1847204C00F80247 /* Build configuration list for PBXProject "FlashAir Library" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8B1894DB1847204C00F80247 /* Debug */,
+				8B1894DC1847204C00F80247 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 8B1894D71847204C00F80247 /* Project object */;
+}
