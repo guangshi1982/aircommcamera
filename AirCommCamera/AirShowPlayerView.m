@@ -10,6 +10,7 @@
 
 @interface AirShowPlayerView ()
 
+// todo:不要？AVPlayerLayerにplayerがあるので。
 @property (nonatomic) AVPlayer *player;
 
 @end

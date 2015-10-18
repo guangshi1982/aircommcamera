@@ -10,6 +10,7 @@
 #import "FAFlashAir.h"
 #import "FAItem.h"
 
+// todo: check connection
 @interface AirFileManager()
 
 @property (nonatomic) FAFlashAir *flashAir;
@@ -32,10 +33,28 @@
 - (id)init
 {
     if (self = [super init]) {
-        _flashAir = [[FAFlashAir alloc] init];
+        _flashAir = [[FAFlashAir alloc] initWithHostname:@"aircard.local"];
+        //_flashAir = [[FAFlashAir alloc] initWithHostname:@"192.168.0.1"];
     }
     
     return self;
+}
+
+- (BOOL)isConnected
+{
+    BOOL ret = NO;
+    
+    if (_flashAir) {
+        NSError *error = nil;
+        int version = [_flashAir getFirmwareVersion:&error];
+        if (version != -1 && error != nil) {
+            ret = YES;
+        } else if (error != nil) {
+            NSLog(@"isConnected %@\n", error);
+        }
+    }
+    
+    return ret;
 }
 
 - (NSArray*)foldersAtDirectory:(NSString*)path
@@ -46,21 +65,23 @@
     // Get file list
     NSArray *fileList = [_flashAir getFileListWithDirectory:path error:&error];
     if (error){
-        NSLog(@"foldersAtDirectory %@\n",error);
+        NSLog(@"foldersAtDirectory %@\n", error);
         return folders;
     }
     
     for (int i = 0; i < fileList.count; i++) {
         FAItem *item = (FAItem*)[fileList objectAtIndex:i];
-        if (item.isDirectory) {
-            [folders addObject:item.path];
+        if (item != nil && item.isDirectory) {
+            AirFile *airFile = [[AirFile alloc] initWithItem:item];
+            [folders addObject:airFile];
         }
     }
     
     return folders;
 }
 
-- (NSArray*)filesAtDirectory:(NSString*)path fileType:(NSString*)type
+// folders and files
+- (NSArray*)filesAtDirectory:(NSString*)path
 {
     NSError *error = nil;
     NSMutableArray *files = [[NSMutableArray alloc] init];
@@ -74,35 +95,133 @@
     
     for (int i = 0; i < fileList.count; i++) {
         FAItem *item = (FAItem*)[fileList objectAtIndex:i];
-        if ([item hasExtension:type]) {
-            [files addObject:item.path];
+        if (item != nil) {
+            AirFile *airFile = [[AirFile alloc] initWithItem:item];
+            [files addObject:airFile];
         }
     }
     
     return files;
 }
 
-- (NSString*)firstFileAtDirectory:(NSString*)path fileType:(NSString*)type
+- (NSArray*)imagesAtDirectory:(NSString*)path
 {
     NSError *error = nil;
-    NSString *file = nil;
+    NSMutableArray *images = [[NSMutableArray alloc] init];
+    NSString *ext = @"JPG";
     
-    NSArray *fileList = [self filesAtDirectory:path fileType:type];
-    if (fileList != nil) {
-        for (int i = 0; i < fileList.count; i++) {
-            FAItem *item = (FAItem*)[fileList objectAtIndex:i];
-            if ([item hasExtension:type]) {
-                file = item.path;
-                break;
-            }
+    // Get file list
+    NSArray *fileList = [_flashAir getFileListWithDirectory:path error:&error];
+    if (error){
+        NSLog(@"filesAtDirectory %@\n", error);
+        return images;
+    }
+    
+    for (int i = 0; i < fileList.count; i++) {
+        FAItem *item = (FAItem*)[fileList objectAtIndex:i];
+        if (item != nil && [item hasExtension:ext]) {
+            AirImage *airImage = [[AirImage alloc] initWithItem:item];
+            [images addObject:airImage];
         }
     }
     
-    if (file == nil) {
-        file = [_flashAir getControlImage:&error];
+    return images;
+}
+
+- (NSArray*)filesAtDirectory:(NSString*)path fileExt:(NSString*)ext
+{
+    NSError *error = nil;
+    NSMutableArray *files = [[NSMutableArray alloc] init];
+    
+    // Get file list
+    NSArray *fileList = [_flashAir getFileListWithDirectory:path error:&error];
+    if (error){
+        NSLog(@"filesAtDirectory %@\n", error);
+        return files;
     }
     
-    return file;
+    for (int i = 0; i < fileList.count; i++) {
+        FAItem *item = (FAItem*)[fileList objectAtIndex:i];
+        if (item != nil && [item hasExtension:ext]) {
+            AirFile *airFile = [[AirFile alloc] initWithItem:item];
+            [files addObject:airFile];
+        }
+    }
+    
+    return files;
+}
+
+- (int)fileCountAtDirectory:(NSString*)path
+{
+    NSError *error = nil;
+    int fileCount = 0;
+    
+    // Get file list
+    NSArray *fileList = [_flashAir getFileListWithDirectory:path error:&error];
+    if (error){
+        NSLog(@"filesAtDirectory %@\n", error);
+        return 0;
+    }
+    
+    fileCount = (int)fileList.count;
+    
+    return fileCount;
+}
+
+- (int)fileCountAtDirectory:(NSString*)path fileExt:(NSString*)ext
+{
+    NSError *error = nil;
+    int fileCount = 0;
+    
+    // Get file list
+    NSArray *fileList = [_flashAir getFileListWithDirectory:path error:&error];
+    if (error){
+        NSLog(@"filesAtDirectory %@\n", error);
+        return 0;
+    }
+    
+    for (int i = 0; i < fileList.count; i++) {
+        FAItem *item = (FAItem*)[fileList objectAtIndex:i];
+        if (item != nil && [item hasExtension:ext]) {
+            fileCount++;
+        }
+    }
+    
+    return fileCount;
+}
+
+- (AirFile*)firstFileAtDirectory:(NSString*)path fileExt:(NSString*)ext
+{
+    NSError *error = nil;
+    AirFile *airFile = nil;
+    
+    NSArray *fileList = [self filesAtDirectory:path fileExt:ext];
+    if (fileList != nil && fileList.count > 0) {
+        airFile = fileList[0];
+    }
+    
+    if (airFile == nil) {
+        NSString *contImage = [_flashAir getControlImage:&error];
+        airFile = [[AirFile alloc] init];
+        airFile.fileType = AirFileTypeFile;
+        airFile.filePath = contImage;
+    }
+    
+    return airFile;
+}
+
+- (NSData*)getFileData:(NSString*)path
+{
+    NSError *error = nil;
+    NSData *fileData = nil;
+    
+    fileData = [_flashAir getFile:path error:&error];
+    if (error) {
+        NSLog(@"getFileData %@\n", error);
+        return nil;
+    }
+    
+    return fileData;
 }
 
 @end

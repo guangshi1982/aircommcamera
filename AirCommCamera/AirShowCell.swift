@@ -1,5 +1,5 @@
 //
-//  AirShowCollectionViewCell.swift
+//  AirShowCell.swift
 //  AirCommCamera
 //
 //  Created by 文光石 on 2015/08/04.
@@ -8,9 +8,9 @@
 
 import UIKit
 
-class AirShowCollectionViewCell: UICollectionViewCell {
+class AirShowCell: UICollectionViewCell {
     @IBOutlet weak var thumbnailImageView: UIImageView?
-    var airshowPath: String?
+    var airShowPath: String?
     
     override func awakeFromNib() {
         super.awakeFromNib()

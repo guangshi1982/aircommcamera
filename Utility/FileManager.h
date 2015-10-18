@@ -14,8 +14,8 @@
 
 @interface FileManager : NSObject
 
-+(void)createRootFolder:(NSString*)rootDir;
-+(void)createSubFolder:(NSString*)subDir;
++(NSString*)createRootFolder:(NSString*)rootDir;
++(NSString*)createSubFolder:(NSString*)subDir;
 +(void)deleteRootFolder;
 +(void)deleteSubFolder:(NSString*)subDir;
 +(NSData*)readDataFromFile:(NSString*)fileName inFolder:(NSString*)folderDir;
@@ -23,6 +23,7 @@
 +(BOOL)saveData:(NSData*)data toFile:(NSString*)fileName;
 +(BOOL)saveData:(NSData*)data toFile:(NSString*)fileName inFolder:(NSString*)folderDir;
 +(BOOL)saveString:(NSString*)str toFile:(NSString*)fileName inFolder:(NSString*)folderDir;
++(BOOL)saveImage:(UIImage*)image toFolder:(NSString*)folderDir;
 +(BOOL)fileExists:(NSString*)filePath;
 +(NSString*)getSubDirectoryPath:(NSString*)subDir;
 +(NSString*)getPathWithFileName:(NSString*)fileName;
@@ -36,6 +37,7 @@
 +(void)saveToPlist:(NSString*)fileName WithDictionary:(NSDictionary*)dic;
 //+(NSMutableDictionary*)loadDictionaryFromPlist:(NSString*)fileName;
 +(NSMutableDictionary*)loadConfigFromPlist:(NSString*)fileName;
++(BOOL)copyFromPath:(NSString*)srcPath toPath:(NSString*)dstPath;
 
 @end
 

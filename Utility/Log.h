@@ -9,7 +9,11 @@
 #ifndef LEDSignalDetector_Log_h
 #define LEDSignalDetector_Log_h
 
-#ifdef DEBUG
+#ifndef DEBUG_LOG
+#define DEBUG_LOG
+#endif
+
+#ifdef DEBUG_LOG
 
     #define DEBUGLOG(...) NSLog(__VA_ARGS__)
     #define DEBUGLOG_PRINTF(FORMAT, ...) printf("%s\n", [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);

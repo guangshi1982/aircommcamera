@@ -11,5 +11,9 @@
 @interface AirShowPlayerViewController : UIViewController
 
 @property (nonatomic, copy) NSString *videoPath;
+@property (nonatomic, copy) NSString *videoTitle;
+@property (nonatomic) UIImage *videoThumbnail;
+
+- (void)updateVideo;
 
 @end

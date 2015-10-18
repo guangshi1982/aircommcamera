@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-#import "AirCameraCapture.h"
+#import "AirCameraManager.h"
 #import "FileManager.h"
 #import "Log.h"
 

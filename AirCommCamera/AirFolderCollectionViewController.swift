@@ -8,35 +8,43 @@
 
 import UIKit
 
-let reuseIdentifier_folder = "AirFolderCell"
 
 class AirFolderCollectionViewController: UICollectionViewController {
     
-    //var folders: NSMutableArray?
-    var folders: [AnyObject]? = []
+    let identifierAirFolderCell = "AirFolderCell"
+    let identifierAirImageCollectionViewController = "AirImageCollectionViewController"
+    
+    var parentDir: String?
+    var airFolders: [AirFile] = []
     var airFileMan: AirFileManager?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("AirFolderCollectionViewController viewDidLoad")
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
         // Register cell classes
         // memo:不要(storyboardでIDを指定したから？)
-        //self.collectionView!.registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: reuseIdentifier_folder)
+        //self.collectionView!.registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: identifierAirFolderCell)
 
         // Do any additional setup after loading the view.
         
         // init
         //self.folders = NSMutableArray()
-        self.airFileMan = AirFileManager()
+        self.airFileMan = AirFileManager.getInstance()
+        
+        // todo:async
+        let airFiles: [AirFile]? = self.airFileMan?.foldersAtDirectory(self.parentDir) as? [AirFile]
+        if (airFiles != nil) {
+            print("airFiles:\(airFiles?.count)")
+            self.airFolders = airFiles!
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        self.folders = self.airFileMan?.foldersAtDirectory("/DICM")
     }
 
     override func didReceiveMemoryWarning() {
@@ -44,15 +52,21 @@ class AirFolderCollectionViewController: UICollectionViewController {
         // Dispose of any resources that can be recreated.
     }
 
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Get the new view controller using [segue destinationViewController].
         // Pass the selected object to the new view controller.
+        print("prepareForSegue[AirImageCollection]")
+        
+        print("identifier: \(segue.identifier)")
+        if segue.identifier == self.identifierAirImageCollectionViewController {
+            let airImageCollectionViewController = segue.destinationViewController as! AirImageCollectionViewController
+            let cell = sender as! AirFolderCell
+            airImageCollectionViewController.parentDir = cell.folderPath
+        }
     }
-    */
 
     // MARK: UICollectionViewDataSource
 
@@ -62,16 +76,25 @@ class AirFolderCollectionViewController: UICollectionViewController {
 
 
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.folders!.count
+        return self.airFolders.count
     }
 
     override func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(reuseIdentifier_folder, forIndexPath: indexPath) as! AirFolderCollectionViewCell
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(identifierAirFolderCell, forIndexPath: indexPath) as! AirFolderCell
     
         // Configure the cell
-        let folderPath = self.folders?[indexPath.row] as! String
-        let file = airFileMan?.firstFileAtDirectory(folderPath, fileType: ".JPG")
-        cell.folderImageView.image = UIImage(contentsOfFile: file!)
+        let airFile: AirFile = self.airFolders[indexPath.row]
+        let folderPath = airFile.filePath
+        let firstAirFile: AirFile? = airFileMan?.firstFileAtDirectory(folderPath, fileExt: ".JPG")
+        if (firstAirFile != nil) {
+            cell.folderPath = folderPath
+            let fileData: NSData? = self.airFileMan?.getFileData(firstAirFile!.filePath)
+            let image: UIImage? = UIImage(data: fileData!)
+            cell.folderImageView1.image = image
+            cell.folderImageView2.image = image
+            cell.folderImageView3.image = image
+            
+        }
     
         return cell
     }

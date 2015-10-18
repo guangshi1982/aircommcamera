@@ -7,14 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		45BF4FD00787CDCCDB2CAC8F /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73EBA39BB17AE1999435C7DE /* Pods.framework */; };
+		C71D0CB61BB82B1500EB4304 /* AirRootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71D0CB51BB82B1500EB4304 /* AirRootViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		C71D0CB81BB8350600EB4304 /* AirPreviewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C71D0CB71BB8350600EB4304 /* AirPreviewController.swift */; settings = {ASSET_TAGS = (); }; };
+		C728A7E11BA1C0830009670C /* AirItemCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C728A7E01BA1C0830009670C /* AirItemCollectionViewLayout.swift */; };
+		C728A7E31BA1C2390009670C /* AirItemCollectionViewFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = C728A7E21BA1C2390009670C /* AirItemCollectionViewFlowLayout.swift */; };
+		C728A7E51BA1C2860009670C /* AirItemCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C728A7E41BA1C2860009670C /* AirItemCollectionViewController.swift */; };
+		C728A7E71BA1C2D10009670C /* AirItemCollectionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C728A7E61BA1C2D10009670C /* AirItemCollectionCell.swift */; };
+		C728A7EA1BA1C2FA0009670C /* AirItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C728A7E91BA1C2FA0009670C /* AirItem.m */; };
+		C728A7EC1BA1C8D40009670C /* AirItemCollectionLayoutAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = C728A7EB1BA1C8D40009670C /* AirItemCollectionLayoutAttributes.swift */; };
+		C728A7EE1BA1CBEF0009670C /* AirItemCollectionSupplementaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C728A7ED1BA1CBEF0009670C /* AirItemCollectionSupplementaryView.swift */; };
 		C730C1A11B67962000684588 /* AirFileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C730C1A01B67962000684588 /* AirFileManager.m */; };
-		C730C1A31B67A40200684588 /* AirFolderCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C730C1A21B67A40200684588 /* AirFolderCollectionViewCell.swift */; };
+		C730C1A31B67A40200684588 /* AirFolderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C730C1A21B67A40200684588 /* AirFolderCell.swift */; };
 		C730C1A71B68B63600684588 /* dream.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = C730C1A51B68B63600684588 /* dream.mp3 */; };
 		C730C1A81B68B63600684588 /* peace_of_mind.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = C730C1A61B68B63600684588 /* peace_of_mind.mp3 */; };
 		C730C1AD1B6A34EF00684588 /* AirShowPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C730C1AC1B6A34EF00684588 /* AirShowPlayerViewController.m */; };
 		C730C1B01B6A35B700684588 /* AirShowPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = C730C1AF1B6A35B700684588 /* AirShowPlayerView.m */; };
 		C730C1B21B70BF1D00684588 /* Photos.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C730C1B11B70BF1D00684588 /* Photos.framework */; };
-		C730C1B41B70FC8200684588 /* AirShowCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C730C1B31B70FC8200684588 /* AirShowCollectionViewCell.swift */; };
+		C730C1B41B70FC8200684588 /* AirShowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C730C1B31B70FC8200684588 /* AirShowCell.swift */; };
 		C730C1B71B73ABF400684588 /* AirSensorManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C730C1B61B73ABF400684588 /* AirSensorManager.m */; };
 		C730C1B91B73AC3B00684588 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C730C1B81B73AC3B00684588 /* CoreLocation.framework */; };
 		C730C1BB1B73AC4800684588 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C730C1BA1B73AC4800684588 /* CoreMotion.framework */; };
@@ -25,15 +35,36 @@
 		C730C1C71B77A4F100684588 /* sample.mov in Resources */ = {isa = PBXBuildFile; fileRef = C730C1C61B77A4F100684588 /* sample.mov */; };
 		C730C1C91B77A80200684588 /* 2.mov in Resources */ = {isa = PBXBuildFile; fileRef = C730C1C81B77A80200684588 /* 2.mov */; };
 		C730C1CB1B78465600684588 /* sample1.mov in Resources */ = {isa = PBXBuildFile; fileRef = C730C1CA1B78465600684588 /* sample1.mov */; };
+		C730C1CD1B7AE9D700684588 /* AirImageSelectedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C730C1CC1B7AE9D700684588 /* AirImageSelectedViewController.swift */; };
+		C730C1CF1B7AEA2300684588 /* AirMovieCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C730C1CE1B7AEA2300684588 /* AirMovieCollectionViewController.swift */; };
+		C730C1D11B7AEA6500684588 /* AirSoundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C730C1D01B7AEA6500684588 /* AirSoundViewController.swift */; };
+		C730C1D31B7B1BF400684588 /* AirImageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C730C1D21B7B1BF400684588 /* AirImageCell.swift */; };
+		C730C1D51B7B1C1A00684588 /* AirMovieCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C730C1D41B7B1C1A00684588 /* AirMovieCell.swift */; };
+		C730C1DA1B7BB9A000684588 /* AirImage.m in Sources */ = {isa = PBXBuildFile; fileRef = C730C1D91B7BB9A000684588 /* AirImage.m */; };
+		C730C1DD1B7BBDF000684588 /* AirMovie.m in Sources */ = {isa = PBXBuildFile; fileRef = C730C1DC1B7BBDF000684588 /* AirMovie.m */; };
+		C730C1E01B7BBE2200684588 /* AirShow.m in Sources */ = {isa = PBXBuildFile; fileRef = C730C1DF1B7BBE2200684588 /* AirShow.m */; };
+		C730C1E21B7DFDD000684588 /* AirImageEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C730C1E11B7DFDD000684588 /* AirImageEditViewController.swift */; };
+		C730C1E41B7DFDFA00684588 /* AirMovieEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C730C1E31B7DFDFA00684588 /* AirMovieEditViewController.swift */; };
+		C730C1E81B7EC00400684588 /* AirShowEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C730C1E71B7EC00400684588 /* AirShowEditViewController.swift */; };
+		C730C1EB1B7F5FF800684588 /* AirFile.m in Sources */ = {isa = PBXBuildFile; fileRef = C730C1EA1B7F5FF800684588 /* AirFile.m */; };
+		C7667BAE1BD0028C00CA41A1 /* AirSetting.m in Sources */ = {isa = PBXBuildFile; fileRef = C7667BAD1BD0028C00CA41A1 /* AirSetting.m */; settings = {ASSET_TAGS = (); }; };
+		C77BE9B61BCC525A0033F761 /* AirLocalCameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77BE9B51BCC525A0033F761 /* AirLocalCameraViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		C7CE59561BB5E90300E09D1C /* Share.m in Sources */ = {isa = PBXBuildFile; fileRef = C7CE59551BB5E90300E09D1C /* Share.m */; settings = {ASSET_TAGS = (); }; };
+		C7CE59591BB6FF6900E09D1C /* AirFrameCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C7CE59581BB6FF6900E09D1C /* AirFrameCell.m */; settings = {ASSET_TAGS = (); }; };
+		C7CE595C1BB7021500E09D1C /* AirFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = C7CE595B1BB7021500E09D1C /* AirFrame.m */; settings = {ASSET_TAGS = (); }; };
+		C7CE595E1BB7F65F00E09D1C /* AirPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CE595D1BB7F65F00E09D1C /* AirPlayerViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		C7CE59601BB7F6A200E09D1C /* AirPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CE595F1BB7F6A200E09D1C /* AirPlayerView.swift */; settings = {ASSET_TAGS = (); }; };
+		C7CE59621BB7F6F800E09D1C /* AirFrameCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CE59611BB7F6F800E09D1C /* AirFrameCell.swift */; settings = {ASSET_TAGS = (); }; };
+		C7ED92AA1BC7970C00FBF447 /* AirSound.m in Sources */ = {isa = PBXBuildFile; fileRef = C7ED92A91BC7970C00FBF447 /* AirSound.m */; settings = {ASSET_TAGS = (); }; };
+		C7ED92AC1BC9678400FBF447 /* AirProgressViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7ED92AB1BC9678400FBF447 /* AirProgressViewController.swift */; settings = {ASSET_TAGS = (); }; };
 		C7F253821B66336C00930132 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F253811B66336C00930132 /* AppDelegate.swift */; };
-		C7F253841B66336C00930132 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F253831B66336C00930132 /* ViewController.swift */; };
 		C7F253871B66336C00930132 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C7F253851B66336C00930132 /* Main.storyboard */; };
 		C7F253891B66336C00930132 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C7F253881B66336C00930132 /* Images.xcassets */; };
 		C7F2538C1B66336C00930132 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = C7F2538A1B66336C00930132 /* LaunchScreen.xib */; };
 		C7F253981B66336C00930132 /* AirCommCameraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F253971B66336C00930132 /* AirCommCameraTests.swift */; };
 		C7F253A21B66342000930132 /* AirFolderCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F253A11B66342000930132 /* AirFolderCollectionViewController.swift */; };
 		C7F253A41B6634BD00930132 /* AirImageCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F253A31B6634BD00930132 /* AirImageCollectionViewController.swift */; };
-		C7F253AA1B6639F800930132 /* AirCameraCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = C7F253A91B6639F800930132 /* AirCameraCapture.m */; };
+		C7F253AA1B6639F800930132 /* AirCameraManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C7F253A91B6639F800930132 /* AirCameraManager.m */; };
 		C7F253AD1B663A8400930132 /* AirShowManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C7F253AC1B663A8400930132 /* AirShowManager.m */; };
 		C7F253AF1B663AAA00930132 /* AirShowCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F253AE1B663AAA00930132 /* AirShowCollectionViewController.swift */; };
 		C7F253B51B663E2D00930132 /* FAFlashAir.m in Sources */ = {isa = PBXBuildFile; fileRef = C7F253B21B663E2D00930132 /* FAFlashAir.m */; };
@@ -45,7 +76,6 @@
 		C7F253CC1B664A2400930132 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7F253C31B664A2400930132 /* Util.swift */; };
 		C7F253CD1B664A2400930132 /* Util_C.m in Sources */ = {isa = PBXBuildFile; fileRef = C7F253C41B664A2400930132 /* Util_C.m */; };
 		C7F253CF1B664D7900930132 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7F253CE1B664D7900930132 /* DropboxSDK.framework */; };
-		E6C88B0978609A82A80E4F88 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 72FE383581171351A15A89D4 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -60,10 +90,20 @@
 
 /* Begin PBXFileReference section */
 		035B1E73BD14F6CB562974F6 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
-		72FE383581171351A15A89D4 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		73EBA39BB17AE1999435C7DE /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C71D0CB51BB82B1500EB4304 /* AirRootViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirRootViewController.swift; sourceTree = "<group>"; };
+		C71D0CB71BB8350600EB4304 /* AirPreviewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirPreviewController.swift; sourceTree = "<group>"; };
+		C728A7E01BA1C0830009670C /* AirItemCollectionViewLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirItemCollectionViewLayout.swift; sourceTree = "<group>"; };
+		C728A7E21BA1C2390009670C /* AirItemCollectionViewFlowLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirItemCollectionViewFlowLayout.swift; sourceTree = "<group>"; };
+		C728A7E41BA1C2860009670C /* AirItemCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirItemCollectionViewController.swift; sourceTree = "<group>"; };
+		C728A7E61BA1C2D10009670C /* AirItemCollectionCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirItemCollectionCell.swift; sourceTree = "<group>"; };
+		C728A7E81BA1C2FA0009670C /* AirItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirItem.h; sourceTree = "<group>"; };
+		C728A7E91BA1C2FA0009670C /* AirItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirItem.m; sourceTree = "<group>"; };
+		C728A7EB1BA1C8D40009670C /* AirItemCollectionLayoutAttributes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirItemCollectionLayoutAttributes.swift; sourceTree = "<group>"; };
+		C728A7ED1BA1CBEF0009670C /* AirItemCollectionSupplementaryView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirItemCollectionSupplementaryView.swift; sourceTree = "<group>"; };
 		C730C19F1B67962000684588 /* AirFileManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFileManager.h; sourceTree = "<group>"; };
 		C730C1A01B67962000684588 /* AirFileManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFileManager.m; sourceTree = "<group>"; };
-		C730C1A21B67A40200684588 /* AirFolderCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirFolderCollectionViewCell.swift; sourceTree = "<group>"; };
+		C730C1A21B67A40200684588 /* AirFolderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirFolderCell.swift; sourceTree = "<group>"; };
 		C730C1A51B68B63600684588 /* dream.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = dream.mp3; sourceTree = "<group>"; };
 		C730C1A61B68B63600684588 /* peace_of_mind.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = peace_of_mind.mp3; sourceTree = "<group>"; };
 		C730C1AB1B6A34EF00684588 /* AirShowPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirShowPlayerViewController.h; sourceTree = "<group>"; };
@@ -71,7 +111,7 @@
 		C730C1AE1B6A35B700684588 /* AirShowPlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirShowPlayerView.h; sourceTree = "<group>"; };
 		C730C1AF1B6A35B700684588 /* AirShowPlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirShowPlayerView.m; sourceTree = "<group>"; };
 		C730C1B11B70BF1D00684588 /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
-		C730C1B31B70FC8200684588 /* AirShowCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirShowCollectionViewCell.swift; sourceTree = "<group>"; };
+		C730C1B31B70FC8200684588 /* AirShowCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirShowCell.swift; sourceTree = "<group>"; };
 		C730C1B51B73ABF400684588 /* AirSensorManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirSensorManager.h; sourceTree = "<group>"; };
 		C730C1B61B73ABF400684588 /* AirSensorManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirSensorManager.m; sourceTree = "<group>"; };
 		C730C1B81B73AC3B00684588 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
@@ -84,10 +124,40 @@
 		C730C1C61B77A4F100684588 /* sample.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = sample.mov; sourceTree = "<group>"; };
 		C730C1C81B77A80200684588 /* 2.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = 2.mov; sourceTree = "<group>"; };
 		C730C1CA1B78465600684588 /* sample1.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = sample1.mov; sourceTree = "<group>"; };
+		C730C1CC1B7AE9D700684588 /* AirImageSelectedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirImageSelectedViewController.swift; sourceTree = "<group>"; };
+		C730C1CE1B7AEA2300684588 /* AirMovieCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirMovieCollectionViewController.swift; sourceTree = "<group>"; };
+		C730C1D01B7AEA6500684588 /* AirSoundViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirSoundViewController.swift; sourceTree = "<group>"; };
+		C730C1D21B7B1BF400684588 /* AirImageCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirImageCell.swift; sourceTree = "<group>"; };
+		C730C1D41B7B1C1A00684588 /* AirMovieCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirMovieCell.swift; sourceTree = "<group>"; };
+		C730C1D81B7BB9A000684588 /* AirImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirImage.h; sourceTree = "<group>"; };
+		C730C1D91B7BB9A000684588 /* AirImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirImage.m; sourceTree = "<group>"; };
+		C730C1DB1B7BBDF000684588 /* AirMovie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirMovie.h; sourceTree = "<group>"; };
+		C730C1DC1B7BBDF000684588 /* AirMovie.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirMovie.m; sourceTree = "<group>"; };
+		C730C1DE1B7BBE2200684588 /* AirShow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirShow.h; sourceTree = "<group>"; };
+		C730C1DF1B7BBE2200684588 /* AirShow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirShow.m; sourceTree = "<group>"; };
+		C730C1E11B7DFDD000684588 /* AirImageEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirImageEditViewController.swift; sourceTree = "<group>"; };
+		C730C1E31B7DFDFA00684588 /* AirMovieEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirMovieEditViewController.swift; sourceTree = "<group>"; };
+		C730C1E71B7EC00400684588 /* AirShowEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirShowEditViewController.swift; sourceTree = "<group>"; };
+		C730C1E91B7F5FF800684588 /* AirFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFile.h; sourceTree = "<group>"; };
+		C730C1EA1B7F5FF800684588 /* AirFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFile.m; sourceTree = "<group>"; };
+		C7667BAC1BD0028C00CA41A1 /* AirSetting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirSetting.h; sourceTree = "<group>"; };
+		C7667BAD1BD0028C00CA41A1 /* AirSetting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirSetting.m; sourceTree = "<group>"; };
+		C77BE9B51BCC525A0033F761 /* AirLocalCameraViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirLocalCameraViewController.swift; sourceTree = "<group>"; };
+		C7CE59541BB5E90300E09D1C /* Share.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Share.h; sourceTree = "<group>"; };
+		C7CE59551BB5E90300E09D1C /* Share.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Share.m; sourceTree = "<group>"; };
+		C7CE59571BB6FF6900E09D1C /* AirFrameCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFrameCell.h; sourceTree = "<group>"; };
+		C7CE59581BB6FF6900E09D1C /* AirFrameCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFrameCell.m; sourceTree = "<group>"; };
+		C7CE595A1BB7021500E09D1C /* AirFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirFrame.h; sourceTree = "<group>"; };
+		C7CE595B1BB7021500E09D1C /* AirFrame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirFrame.m; sourceTree = "<group>"; };
+		C7CE595D1BB7F65F00E09D1C /* AirPlayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirPlayerViewController.swift; sourceTree = "<group>"; };
+		C7CE595F1BB7F6A200E09D1C /* AirPlayerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirPlayerView.swift; sourceTree = "<group>"; };
+		C7CE59611BB7F6F800E09D1C /* AirFrameCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirFrameCell.swift; sourceTree = "<group>"; };
+		C7ED92A81BC7970C00FBF447 /* AirSound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirSound.h; sourceTree = "<group>"; };
+		C7ED92A91BC7970C00FBF447 /* AirSound.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirSound.m; sourceTree = "<group>"; };
+		C7ED92AB1BC9678400FBF447 /* AirProgressViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirProgressViewController.swift; sourceTree = "<group>"; };
 		C7F2537C1B66336C00930132 /* AirCommCamera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AirCommCamera.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C7F253801B66336C00930132 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C7F253811B66336C00930132 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		C7F253831B66336C00930132 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		C7F253861B66336C00930132 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C7F253881B66336C00930132 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		C7F2538B1B66336C00930132 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -97,8 +167,8 @@
 		C7F253A11B66342000930132 /* AirFolderCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirFolderCollectionViewController.swift; sourceTree = "<group>"; };
 		C7F253A31B6634BD00930132 /* AirImageCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirImageCollectionViewController.swift; sourceTree = "<group>"; };
 		C7F253A71B6639F800930132 /* AirCommCamera-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AirCommCamera-Bridging-Header.h"; sourceTree = "<group>"; };
-		C7F253A81B6639F800930132 /* AirCameraCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirCameraCapture.h; sourceTree = "<group>"; };
-		C7F253A91B6639F800930132 /* AirCameraCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirCameraCapture.m; sourceTree = "<group>"; };
+		C7F253A81B6639F800930132 /* AirCameraManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirCameraManager.h; sourceTree = "<group>"; };
+		C7F253A91B6639F800930132 /* AirCameraManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirCameraManager.m; sourceTree = "<group>"; };
 		C7F253AB1B663A8400930132 /* AirShowManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirShowManager.h; sourceTree = "<group>"; };
 		C7F253AC1B663A8400930132 /* AirShowManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirShowManager.m; sourceTree = "<group>"; };
 		C7F253AE1B663AAA00930132 /* AirShowCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AirShowCollectionViewController.swift; sourceTree = "<group>"; };
@@ -129,7 +199,7 @@
 				C730C1B91B73AC3B00684588 /* CoreLocation.framework in Frameworks */,
 				C730C1B21B70BF1D00684588 /* Photos.framework in Frameworks */,
 				C7F253CF1B664D7900930132 /* DropboxSDK.framework in Frameworks */,
-				E6C88B0978609A82A80E4F88 /* libPods.a in Frameworks */,
+				45BF4FD00787CDCCDB2CAC8F /* Pods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,7 +221,7 @@
 				C730C1B81B73AC3B00684588 /* CoreLocation.framework */,
 				C730C1B11B70BF1D00684588 /* Photos.framework */,
 				C7F253CE1B664D7900930132 /* DropboxSDK.framework */,
-				72FE383581171351A15A89D4 /* libPods.a */,
+				73EBA39BB17AE1999435C7DE /* Pods.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -213,27 +283,65 @@
 			isa = PBXGroup;
 			children = (
 				C7F253811B66336C00930132 /* AppDelegate.swift */,
-				C7F253831B66336C00930132 /* ViewController.swift */,
+				C728A7E41BA1C2860009670C /* AirItemCollectionViewController.swift */,
+				C728A7E01BA1C0830009670C /* AirItemCollectionViewLayout.swift */,
+				C728A7E21BA1C2390009670C /* AirItemCollectionViewFlowLayout.swift */,
+				C728A7ED1BA1CBEF0009670C /* AirItemCollectionSupplementaryView.swift */,
+				C728A7E61BA1C2D10009670C /* AirItemCollectionCell.swift */,
+				C728A7EB1BA1C8D40009670C /* AirItemCollectionLayoutAttributes.swift */,
+				C728A7E81BA1C2FA0009670C /* AirItem.h */,
+				C728A7E91BA1C2FA0009670C /* AirItem.m */,
+				C71D0CB51BB82B1500EB4304 /* AirRootViewController.swift */,
 				C7F253AE1B663AAA00930132 /* AirShowCollectionViewController.swift */,
-				C730C1B31B70FC8200684588 /* AirShowCollectionViewCell.swift */,
+				C730C1B31B70FC8200684588 /* AirShowCell.swift */,
+				C730C1E71B7EC00400684588 /* AirShowEditViewController.swift */,
+				C71D0CB71BB8350600EB4304 /* AirPreviewController.swift */,
+				C7CE595D1BB7F65F00E09D1C /* AirPlayerViewController.swift */,
+				C7CE595F1BB7F6A200E09D1C /* AirPlayerView.swift */,
+				C7CE59611BB7F6F800E09D1C /* AirFrameCell.swift */,
 				C730C1AB1B6A34EF00684588 /* AirShowPlayerViewController.h */,
 				C730C1AC1B6A34EF00684588 /* AirShowPlayerViewController.m */,
+				C7CE59571BB6FF6900E09D1C /* AirFrameCell.h */,
+				C7CE59581BB6FF6900E09D1C /* AirFrameCell.m */,
 				C730C1AE1B6A35B700684588 /* AirShowPlayerView.h */,
 				C730C1AF1B6A35B700684588 /* AirShowPlayerView.m */,
-				C7F253A11B66342000930132 /* AirFolderCollectionViewController.swift */,
-				C730C1A21B67A40200684588 /* AirFolderCollectionViewCell.swift */,
-				C7F253A31B6634BD00930132 /* AirImageCollectionViewController.swift */,
 				C730C1BC1B73ADD800684588 /* AirCameraViewController.swift */,
-				C7F253A81B6639F800930132 /* AirCameraCapture.h */,
-				C7F253A91B6639F800930132 /* AirCameraCapture.m */,
+				C77BE9B51BCC525A0033F761 /* AirLocalCameraViewController.swift */,
+				C7F253A11B66342000930132 /* AirFolderCollectionViewController.swift */,
+				C730C1A21B67A40200684588 /* AirFolderCell.swift */,
+				C7F253A31B6634BD00930132 /* AirImageCollectionViewController.swift */,
+				C730C1CC1B7AE9D700684588 /* AirImageSelectedViewController.swift */,
+				C730C1E11B7DFDD000684588 /* AirImageEditViewController.swift */,
+				C730C1D21B7B1BF400684588 /* AirImageCell.swift */,
+				C730C1CE1B7AEA2300684588 /* AirMovieCollectionViewController.swift */,
+				C730C1D41B7B1C1A00684588 /* AirMovieCell.swift */,
+				C730C1E31B7DFDFA00684588 /* AirMovieEditViewController.swift */,
+				C730C1D01B7AEA6500684588 /* AirSoundViewController.swift */,
+				C7ED92AB1BC9678400FBF447 /* AirProgressViewController.swift */,
+				C7F253A81B6639F800930132 /* AirCameraManager.h */,
+				C7F253A91B6639F800930132 /* AirCameraManager.m */,
+				C730C1B51B73ABF400684588 /* AirSensorManager.h */,
+				C730C1B61B73ABF400684588 /* AirSensorManager.m */,
 				C730C1C01B75294400684588 /* AirImageManager.h */,
 				C730C1C11B75294400684588 /* AirImageManager.m */,
 				C7F253AB1B663A8400930132 /* AirShowManager.h */,
 				C7F253AC1B663A8400930132 /* AirShowManager.m */,
 				C730C19F1B67962000684588 /* AirFileManager.h */,
 				C730C1A01B67962000684588 /* AirFileManager.m */,
-				C730C1B51B73ABF400684588 /* AirSensorManager.h */,
-				C730C1B61B73ABF400684588 /* AirSensorManager.m */,
+				C7667BAC1BD0028C00CA41A1 /* AirSetting.h */,
+				C7667BAD1BD0028C00CA41A1 /* AirSetting.m */,
+				C730C1E91B7F5FF800684588 /* AirFile.h */,
+				C730C1EA1B7F5FF800684588 /* AirFile.m */,
+				C730C1D81B7BB9A000684588 /* AirImage.h */,
+				C730C1D91B7BB9A000684588 /* AirImage.m */,
+				C7CE595A1BB7021500E09D1C /* AirFrame.h */,
+				C7CE595B1BB7021500E09D1C /* AirFrame.m */,
+				C730C1DB1B7BBDF000684588 /* AirMovie.h */,
+				C730C1DC1B7BBDF000684588 /* AirMovie.m */,
+				C7ED92A81BC7970C00FBF447 /* AirSound.h */,
+				C7ED92A91BC7970C00FBF447 /* AirSound.m */,
+				C730C1DE1B7BBE2200684588 /* AirShow.h */,
+				C730C1DF1B7BBE2200684588 /* AirShow.m */,
 				C7F253A71B6639F800930132 /* AirCommCamera-Bridging-Header.h */,
 				C7F253851B66336C00930132 /* Main.storyboard */,
 				C7F253881B66336C00930132 /* Images.xcassets */,
@@ -291,6 +399,8 @@
 				C7F253C21B664A2400930132 /* Uploader.m */,
 				C7F253C31B664A2400930132 /* Util.swift */,
 				C7F253C41B664A2400930132 /* Util_C.m */,
+				C7CE59541BB5E90300E09D1C /* Share.h */,
+				C7CE59551BB5E90300E09D1C /* Share.m */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -307,6 +417,7 @@
 				C7F253791B66336C00930132 /* Frameworks */,
 				C7F2537A1B66336C00930132 /* Resources */,
 				F4DC84831B97C6E9E792BE2F /* Copy Pods Resources */,
+				A34E81DE837A792BA07366F9 /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -341,7 +452,8 @@
 		C7F253741B66336C00930132 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0640;
+				LastSwiftUpdateCheck = 0700;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = Threees;
 				TargetAttributes = {
 					C7F2537B1B66336C00930132 = {
@@ -400,6 +512,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		A34E81DE837A792BA07366F9 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		B668A64A2D6BAADD782C4EAD /* Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -439,27 +566,57 @@
 			files = (
 				C7F253B51B663E2D00930132 /* FAFlashAir.m in Sources */,
 				C7F253CB1B664A2400930132 /* Uploader.m in Sources */,
+				C71D0CB81BB8350600EB4304 /* AirPreviewController.swift in Sources */,
 				C730C1BD1B73ADD800684588 /* AirCameraViewController.swift in Sources */,
+				C730C1E21B7DFDD000684588 /* AirImageEditViewController.swift in Sources */,
 				C730C1A11B67962000684588 /* AirFileManager.m in Sources */,
 				C7F253CD1B664A2400930132 /* Util_C.m in Sources */,
+				C730C1D11B7AEA6500684588 /* AirSoundViewController.swift in Sources */,
 				C7F253C71B664A2400930132 /* DebugLog.swift in Sources */,
 				C7F253AF1B663AAA00930132 /* AirShowCollectionViewController.swift in Sources */,
+				C728A7EA1BA1C2FA0009670C /* AirItem.m in Sources */,
+				C730C1E81B7EC00400684588 /* AirShowEditViewController.swift in Sources */,
 				C7F253A21B66342000930132 /* AirFolderCollectionViewController.swift in Sources */,
+				C730C1E01B7BBE2200684588 /* AirShow.m in Sources */,
+				C730C1DA1B7BB9A000684588 /* AirImage.m in Sources */,
+				C7CE59591BB6FF6900E09D1C /* AirFrameCell.m in Sources */,
+				C7ED92AA1BC7970C00FBF447 /* AirSound.m in Sources */,
+				C730C1DD1B7BBDF000684588 /* AirMovie.m in Sources */,
+				C730C1EB1B7F5FF800684588 /* AirFile.m in Sources */,
+				C730C1CF1B7AEA2300684588 /* AirMovieCollectionViewController.swift in Sources */,
+				C728A7E31BA1C2390009670C /* AirItemCollectionViewFlowLayout.swift in Sources */,
+				C728A7EE1BA1CBEF0009670C /* AirItemCollectionSupplementaryView.swift in Sources */,
+				C730C1D31B7B1BF400684588 /* AirImageCell.swift in Sources */,
+				C71D0CB61BB82B1500EB4304 /* AirRootViewController.swift in Sources */,
 				C730C1B01B6A35B700684588 /* AirShowPlayerView.m in Sources */,
+				C7CE59601BB7F6A200E09D1C /* AirPlayerView.swift in Sources */,
+				C7CE59561BB5E90300E09D1C /* Share.m in Sources */,
 				C7F253CC1B664A2400930132 /* Util.swift in Sources */,
-				C730C1A31B67A40200684588 /* AirFolderCollectionViewCell.swift in Sources */,
+				C728A7E51BA1C2860009670C /* AirItemCollectionViewController.swift in Sources */,
+				C7ED92AC1BC9678400FBF447 /* AirProgressViewController.swift in Sources */,
+				C730C1A31B67A40200684588 /* AirFolderCell.swift in Sources */,
 				C7F253B61B663E2D00930132 /* FAItem.m in Sources */,
+				C730C1CD1B7AE9D700684588 /* AirImageSelectedViewController.swift in Sources */,
+				C7CE595E1BB7F65F00E09D1C /* AirPlayerViewController.swift in Sources */,
 				C7F253CA1B664A2400930132 /* Log.m in Sources */,
-				C7F253841B66336C00930132 /* ViewController.swift in Sources */,
 				C730C1C21B75294400684588 /* AirImageManager.m in Sources */,
-				C7F253AA1B6639F800930132 /* AirCameraCapture.m in Sources */,
-				C730C1B41B70FC8200684588 /* AirShowCollectionViewCell.swift in Sources */,
+				C7CE59621BB7F6F800E09D1C /* AirFrameCell.swift in Sources */,
+				C7F253AA1B6639F800930132 /* AirCameraManager.m in Sources */,
+				C730C1B41B70FC8200684588 /* AirShowCell.swift in Sources */,
+				C7CE595C1BB7021500E09D1C /* AirFrame.m in Sources */,
+				C730C1E41B7DFDFA00684588 /* AirMovieEditViewController.swift in Sources */,
 				C730C1B71B73ABF400684588 /* AirSensorManager.m in Sources */,
+				C7667BAE1BD0028C00CA41A1 /* AirSetting.m in Sources */,
 				C7F253821B66336C00930132 /* AppDelegate.swift in Sources */,
+				C728A7E71BA1C2D10009670C /* AirItemCollectionCell.swift in Sources */,
 				C7F253A41B6634BD00930132 /* AirImageCollectionViewController.swift in Sources */,
+				C730C1D51B7B1C1A00684588 /* AirMovieCell.swift in Sources */,
 				C7F253AD1B663A8400930132 /* AirShowManager.m in Sources */,
 				C730C1AD1B6A34EF00684588 /* AirShowPlayerViewController.m in Sources */,
+				C77BE9B61BCC525A0033F761 /* AirLocalCameraViewController.swift in Sources */,
 				C7F253C81B664A2400930132 /* FileManager.m in Sources */,
+				C728A7EC1BA1C8D40009670C /* AirItemCollectionLayoutAttributes.swift in Sources */,
+				C728A7E11BA1C0830009670C /* AirItemCollectionViewLayout.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -521,7 +678,9 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -537,7 +696,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -565,6 +724,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -575,7 +735,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -594,8 +754,9 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = AirCommCamera/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.threees.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "AirCommCamera/AirCommCamera-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -614,8 +775,9 @@
 					"$(PROJECT_DIR)",
 				);
 				INFOPLIST_FILE = AirCommCamera/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.threees.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "AirCommCamera/AirCommCamera-Bridging-Header.h";
 			};
@@ -635,6 +797,7 @@
 				);
 				INFOPLIST_FILE = AirCommCameraTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.threees.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AirCommCamera.app/AirCommCamera";
 			};
@@ -650,6 +813,7 @@
 				);
 				INFOPLIST_FILE = AirCommCameraTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.threees.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AirCommCamera.app/AirCommCamera";
 			};

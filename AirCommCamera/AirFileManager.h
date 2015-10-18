@@ -7,12 +7,20 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "AirFile.h"
+#import "AirImage.h"
 
 @interface AirFileManager : NSObject
 
 + (AirFileManager*)getInstance;
+- (BOOL)isConnected;
 - (NSArray*)foldersAtDirectory:(NSString*)path;
-- (NSArray*)filesAtDirectory:(NSString*)path fileType:(NSString*)type;
-- (NSString*)firstFileAtDirectory:(NSString*)path fileType:(NSString*)type;
+- (NSArray*)filesAtDirectory:(NSString*)path;
+- (NSArray*)imagesAtDirectory:(NSString*)path;
+- (NSArray*)filesAtDirectory:(NSString*)path fileExt:(NSString*)ext;
+- (int)fileCountAtDirectory:(NSString*)path;
+- (int)fileCountAtDirectory:(NSString*)path fileExt:(NSString*)ext;
+- (AirFile*)firstFileAtDirectory:(NSString*)path fileExt:(NSString*)ext;
+- (NSData*)getFileData:(NSString*)path;
 
 @end

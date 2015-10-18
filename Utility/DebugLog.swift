@@ -152,21 +152,21 @@ struct DebugLog
     static var printHandler: (Any!, String, String, Int) -> Void = { body, filename, functionName, line in
         
         if body == nil {
-            println("[\(filename).\(functionName):\(line)]")    // print functionName
+            print("[\(filename).\(functionName):\(line)]")    // print functionName
             return
         }
         
         if let body = body as? String {
             if count(body) == 0 {
-                println("") // print break
+                print("") // print break
                 return
             }
         }
         
-        println("[\(filename):\(line)] \(body)")
+        print("[\(filename):\(line)] \(body)")
     }
     
-    static func print(_ body: Any! = nil, var filename: String = __FILE__, var functionName: String = __FUNCTION__, line: Int = __LINE__)
+    static func print(body: Any! = nil, var filename: String = __FILE__, var functionName: String = __FUNCTION__, line: Int = __LINE__)
     {
         #if DEBUG
             
@@ -191,7 +191,7 @@ func LOG(filename: String = __FILE__, var functionName: String = __FUNCTION__, l
     #endif
 }
 
-/// LOG(...) = println
+/// LOG(...) = print
 func LOG(body: Any, filename: String = __FILE__, var functionName: String = __FUNCTION__, line: Int = __LINE__)
 {
     #if DEBUG
@@ -201,7 +201,7 @@ func LOG(body: Any, filename: String = __FILE__, var functionName: String = __FU
     #endif
 }
 
-/// LOG_OBJECT(myObject) = println("myObject = ...")
+/// LOG_OBJECT(myObject) = print("myObject = ...")
 func LOG_OBJECT(body: Any, filename: String = __FILE__, var functionName: String = __FUNCTION__, line: Int = __LINE__)
 {
     #if DEBUG

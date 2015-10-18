@@ -22,6 +22,10 @@ typedef struct {
     float faceAngle;
     
     BOOL hasSmile;
+    BOOL hasMouth;
+    BOOL hasLeftEye;
+    BOOL hasRightEye;
+    
     BOOL leftEyeClosed;
     BOOL rightEyeClosed;
     
@@ -37,6 +41,12 @@ typedef struct {
 @interface AirImageManager : NSObject
 
 +(AirImageManager*)getInstance;
--(NSArray*)detectFace:(UIImage*)image;
+-(NSArray*)detectFace:(UIImage*)image inBounds:(CGRect)bounds;
+-(NSArray*)imageFilterCategories;
+-(NSArray*)imageFilterNamesInCategory:(NSString*)category;
+-(NSArray*)imageFilterNamesInCategories:(NSArray*)categories;
+-(UIImage*)imageFilteredWithName:(NSString*)name image:(UIImage*)image;
+-(NSArray*)imagesFilteredWithNames:(NSArray*)names image:(UIImage*)image;
+-(UIImage*)resizeImageToFill:(UIImage*)orgImage bounds:(CGRect)bounds;
 
 @end

@@ -8,21 +8,25 @@
 
 #import "AirShowPlayerViewController.h"
 #import "AirShowPlayerView.h"
+#import "AirFrameCell.h"
 #import <AVFoundation/AVFoundation.h>
 #import <Foundation/Foundation.h>
 
 // Define this constant for the key-value observation context.
 static const NSString *ItemStatusContext = @"status";
+static NSString *identifierAirFrameCell = @"AirFrameCell";
 
 @class AirShowPlayerView;
 
-@interface AirShowPlayerViewController ()
+@interface AirShowPlayerViewController () <UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UIScrollViewDelegate>
 
 @property (nonatomic) AVPlayer *player;
 @property (nonatomic) AVPlayerItem *playerItem;
 //@property (nonatomic) AirShowPlayerView *playerView;
+@property (nonatomic) NSMutableArray *airFrames;
 @property (nonatomic, weak) IBOutlet AirShowPlayerView *playerView;
 @property (nonatomic, weak) IBOutlet UIButton *playButton;
+@property (nonatomic, weak) IBOutlet UICollectionView *airFrameCollectionView;
 
 @end
 
@@ -32,7 +36,13 @@ static const NSString *ItemStatusContext = @"status";
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    [self loadAssetFromFile];
+    
+    _airFrames = [[NSMutableArray alloc] init];
+    /*
+    if (_videoPath != nil) {
+        NSLog(@"videoPath:%@", _videoPath);
+        [self loadAssetFromFile];
+    }*/
 }
 
 - (void)didReceiveMemoryWarning {
@@ -40,8 +50,16 @@ static const NSString *ItemStatusContext = @"status";
     // Dispose of any resources that can be recreated.
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    //[self loadAssetFromFile];
+}
+
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
+    
+    NSLog(@"viewDidDisappear");
     
     // memo:need to remove!
     [self.playerItem removeObserver:self forKeyPath:@"status"];
@@ -57,6 +75,30 @@ static const NSString *ItemStatusContext = @"status";
     // Pass the selected object to the new view controller.
 }
 */
+
+#pragma UICollectionViewDataSource
+
+- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+    return 1;
+}
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return _airFrames.count;
+}
+
+// The cell that is returned must be retrieved from a call to -dequeueReusableCellWithReuseIdentifier:forIndexPath:
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    AirFrameCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identifierAirFrameCell forIndexPath:indexPath];
+    
+    return cell;
+}
+
+- (void)updateVideo {
+    if (_videoPath != nil) {
+        NSLog(@"videoPath:%@", _videoPath);
+        [self loadAssetFromFile];
+    }
+}
 
 - (void)loadAssetFromFile {
     NSURL *videoUrl = [NSURL fileURLWithPath:_videoPath];
@@ -126,6 +168,10 @@ static const NSString *ItemStatusContext = @"status";
     return;
 }
 
+- (void)shareCompleted:(NSString*)activityType completed:(BOOL)completed {
+    
+}
+
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
     NSLog(@"playerItemDidReachEnd");
     [self.player seekToTime:kCMTimeZero];
@@ -135,5 +181,38 @@ static const NSString *ItemStatusContext = @"status";
     [self.player play];
 }
 
+- (IBAction)shareAction:(id)sender {
+    NSArray *activityItems = [NSArray arrayWithObjects:_videoTitle, _videoThumbnail, nil];
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
+    
+    activityViewController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError){
+        NSLog(@"completionWithItemsHandler:%@", activityType);
+    };
+    
+    [self presentViewController:activityViewController animated:true completion:^{
+        NSLog(@"activityViewController");
+    }];
+     
+}
+
+- (IBAction)deleteAction:(id)sender {
+    UIAlertController *actionSheetController = [UIAlertController alertControllerWithTitle:nil message:@"Delete this show?" preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    UIAlertAction *delete = [UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+        NSLog(@"Deleted");
+    }];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        NSLog(@"Canceled");
+    }];
+    
+    [actionSheetController addAction:delete];
+    [actionSheetController addAction:cancel];
+    [self presentViewController:actionSheetController animated:true completion:^{
+        NSLog(@"actionSheetController");
+    }];
+}
+
+- (IBAction)editAction:(id)sender {
+}
 
 @end
