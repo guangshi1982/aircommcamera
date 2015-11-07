@@ -71,7 +71,10 @@
 {
     NSString *fileName = nil;
     
-    fileName = [path lastPathComponent];
+    NSString *lastComp = [path lastPathComponent];
+    if (lastComp != nil) {
+        fileName = [lastComp stringByDeletingPathExtension];
+    }
     
     return fileName;
 }

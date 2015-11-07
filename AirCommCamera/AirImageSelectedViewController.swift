@@ -29,6 +29,7 @@ class AirImageSelectedViewController: UIViewController, UICollectionViewDelegate
     // todo:movieのfolderからmovieの配列を作成
     var airMovies: [AirMovie] = []
     
+    // todo: create queue in AirShowManager?
     var movieQueue: dispatch_queue_t?
 
     override func viewDidLoad() {
@@ -65,6 +66,13 @@ class AirImageSelectedViewController: UIViewController, UICollectionViewDelegate
             print("prepareForSegue[create movies]")
             let airMovieCollectionViewController = segue.destinationViewController as! AirMovieCollectionViewController
             airMovieCollectionViewController.airMovieFlolder = sender as? String
+            // memo: need to set before create movies
+            self.airShowMan?.observer = airMovieCollectionViewController
+            
+            // todo: create in movie controller? (set air images to movie controller)
+            dispatch_async(self.movieQueue!, { () -> Void in
+                self.airShowMan!.createAirMoviesWithAirImages(self.airImages, movies: airMovieCollectionViewController.airMovieFlolder)
+            })
             
             /*
             var imageCount = self.airImages.count
@@ -157,7 +165,7 @@ class AirImageSelectedViewController: UIViewController, UICollectionViewDelegate
     }
     
     // MARK: AirShowObserver
-    
+    /*
     func progress(progress: Float, inCreatingMovies movieFolder: String!) {
         // todo: add progress bar
         print("CreatingMovie progress:\(progress)")
@@ -174,19 +182,21 @@ class AirImageSelectedViewController: UIViewController, UICollectionViewDelegate
                 }
             )
         }
-    }
+    }*/
 
     // MARK: Action
     
     @IBAction func nextAction(sender: AnyObject) {
+        /*
         self.airProgressViewController = self.storyboard!.instantiateViewControllerWithIdentifier(self.identifierAirProgressViewController) as! AirProgressViewController
         // todo:custom segue
         self.presentViewController(self.airProgressViewController!, animated: true) { () -> Void in
             print("AirProgressViewController")
             self.airShowMan!.createAirMoviesWithAirImages(self.airImages, movies: "airfolder/tmp/movie")
-        }
+        }*/
         
-        //self.airShowMan!.createAirMoviesWithAirImages(self.airImages, movies: "airfolder/tmp/movie")
+        // todo: in storyborad?
+        [self.performSegueWithIdentifier(self.identifierAirMovieCollectionViewController, sender: "airfolder/tmp/movie")]
     }
     
     @IBAction func addAction(sender: AnyObject) {

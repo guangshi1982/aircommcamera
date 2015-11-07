@@ -12,6 +12,10 @@ class AirSoundViewController: AirPlayerViewController, AirShowObserver {
 
     let identifierAirShowCollectionViewController = "AirShowCollectionViewController"
     
+    @IBOutlet weak var nextBarButtonItem: UIBarButtonItem!
+    @IBOutlet weak var progressView: UIProgressView!
+    @IBOutlet weak var indicatorView: UIActivityIndicatorView!
+    
     var airShowMan: AirShowManager?
     
     override func viewDidLoad() {
@@ -20,13 +24,30 @@ class AirSoundViewController: AirPlayerViewController, AirShowObserver {
 
         // Do any additional setup after loading the view.
         self.airShowMan = AirShowManager.getInstance()
-        self.airShowMan!.observer = self
+        //self.airShowMan!.observer = self
+        
+        self.nextBarButtonItem.enabled = false
+        //self.indicatorView.hidden = true
+        //self.indicatorView.hidesWhenStopped = true // not false
+        self.playButton.enabled = false
+        self.progressView.progress = 0
     }
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
+        print("AirSoundViewController viewDidAppear")
         
-        self.updateVideo()
+        //self.indicatorView.hidden = false
+        self.indicatorView.startAnimating()
+        //self.updateVideo()
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        if (self.indicatorView.isAnimating()) {
+            self.indicatorView.stopAnimating()
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -45,11 +66,30 @@ class AirSoundViewController: AirPlayerViewController, AirShowObserver {
         
         print("identifier: \(segue.identifier)")
         if segue.identifier == self.identifierAirShowCollectionViewController {
-            //let airShowCollectionViewController = segue.destinationViewController as! AirShowCollectionViewController
+            let airShowCollectionViewController = segue.destinationViewController as! AirShowCollectionViewController
+            airShowCollectionViewController.airShowPath = sender as? String
         }
     }
 
     // MARK: AirShowObserver
+    
+    func progress(progress: Float, inConnectingMovies moviePath: String!) {
+        // todo: add progress bar
+        print("ConnectingMovie progress:\(progress)")
+        
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            self.progressView.progress = progress
+            if (progress == 100) {
+                self.updateVideo()
+                self.progressView.progress = 0
+                self.nextBarButtonItem.enabled = true
+                self.playButton.enabled = true
+                if (self.indicatorView.isAnimating()) {
+                    self.indicatorView.stopAnimating()
+                }
+            }
+        }
+    }
     
     func progress(progress: Float, inCreatingShow showPath: String!) {
         // todo:progress bar
@@ -65,12 +105,21 @@ class AirSoundViewController: AirPlayerViewController, AirShowObserver {
             //FileManager.createSubFolder(dstPath)
             FileManager.copyFromPath("airfolder/tmp", toPath: dstPath)
             [self.performSegueWithIdentifier(self.identifierAirShowCollectionViewController, sender: dstPath)]
+            
+            if (self.indicatorView.isAnimating()) {
+                self.indicatorView.stopAnimating()
+            }
+            
+            self.airShowMan?.observer = nil
         }
     }
     
     // MARK: Action
     
     @IBAction func makeAction(sender: AnyObject) {
+        if (self.indicatorView.isAnimating() == false) {
+            self.indicatorView.startAnimating()
+        }
         // test
         let soundPath = NSBundle.mainBundle().pathForResource("dream", ofType:"mp3")
         let airSound: AirSound = AirSound(path: soundPath)

@@ -59,22 +59,23 @@ class AirCameraViewController: UIViewController {
     
     @IBAction func showCapturedImages(sender: AnyObject) {
         // test
-        FileManager.createSubFolder("airimage/tmp")
+        FileManager.createSubFolder("airimage/aircamera/tmp")
         for (var i = 1; i <= 3; i++) {
             let imageName = String(format: "%d.jpg", i)
             let image = UIImage(named: imageName)
             let data = UIImageJPEGRepresentation(image!, 1)
-            FileManager.saveData(data, toFile: imageName, inFolder: "airimage/tmp")
+            FileManager.saveData(data, toFile: imageName, inFolder: "airimage/aircamera/tmp")
         }
         
         //let folderPath = FileManager.getSubDirectoryPath("airimage/tmp")
-        let folderPath = "airimage/tmp"
+        let folderPath = "airimage/aircamera/tmp"
         
         //let airImageCollectionViewController = self.storyboard!.instantiateViewControllerWithIdentifier("AirImageCollectionViewController") as! AirImageCollectionViewController
         //airImageCollectionViewController.parentDir = folderPath
         let airNavigationController: UINavigationController = self.storyboard!.instantiateViewControllerWithIdentifier(self.identifierAirImageNavigationController) as! UINavigationController
         let airImageCollectionViewController = airNavigationController.topViewController as! AirImageCollectionViewController
         airImageCollectionViewController.parentDir = folderPath
+        airImageCollectionViewController.pathType = 1
         // memo:storyboardでnavigationcontrollerにrootviewcontrollerを設定していない場合、コード上でcontrollerを作ってpushする
         //airNavigationController.pushViewController(airImageCollectionViewController, animated: false)
         
@@ -86,7 +87,13 @@ class AirCameraViewController: UIViewController {
     }
     
     @IBAction func closeCamera(sender: AnyObject) {
-        
+        self.dismissViewControllerAnimated(true, completion: { () -> Void in
+            print("dismissViewController")
+        })
+    }
+    
+    @IBAction func unwindBackToAirCameraController(unwindSegue: UIStoryboardSegue) {
+        // todo:unwindSegue.sourceViewController.isKindOfClass()
     }
 }
 

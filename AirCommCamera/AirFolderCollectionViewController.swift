@@ -13,6 +13,7 @@ class AirFolderCollectionViewController: UICollectionViewController {
     
     let identifierAirFolderCell = "AirFolderCell"
     let identifierAirImageCollectionViewController = "AirImageCollectionViewController"
+    let identifierAirShowCollectionViewController = "AirShowCollectionViewController"
     
     var parentDir: String?
     var airFolders: [AirFile] = []
@@ -65,6 +66,8 @@ class AirFolderCollectionViewController: UICollectionViewController {
             let airImageCollectionViewController = segue.destinationViewController as! AirImageCollectionViewController
             let cell = sender as! AirFolderCell
             airImageCollectionViewController.parentDir = cell.folderPath
+            airImageCollectionViewController.pathType = 1
+            //airImageCollectionViewController.navigationItem.leftBarButtonItem = UIBarButtonItem(
         }
     }
 
@@ -130,4 +133,12 @@ class AirFolderCollectionViewController: UICollectionViewController {
     }
     */
 
+    // MARK: Action
+    
+    @IBAction func cancelAction(sender: AnyObject) {
+        //self.performSegueWithIdentifier(self.identifierAirShowCollectionViewController, sender: nil)
+        self.dismissViewControllerAnimated(true, completion: { () -> Void in
+            print("dismiss AirFolderCollectionViewController")
+        })
+    }
 }

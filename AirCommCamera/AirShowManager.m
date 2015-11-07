@@ -10,6 +10,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import "AirShowManager.h"
 #import "FileManager.h"
+#import "Log.h"
 
 #define kVideoFPS   24
 
@@ -213,8 +214,10 @@ typedef enum {
     NSLog(@"writeCompleted:[%d]", _movieCount);
     
     if (_observer != nil) {
-        float progress = (float)(_movieCount + 1) / [_airImages count];
-        [_observer progress:progress * 100 inCreatingMovies:_movieFolder];
+        if ([_observer respondsToSelector:@selector(progress:inCreatingMovies:inFolder:)]) {
+            float progress = (float)(_movieCount + 1) / [_airImages count];
+            [_observer progress:progress * 100 inCreatingMovies:moviePath inFolder:_movieFolder];
+        }
     }
     
     _movieCount++;
@@ -435,13 +438,13 @@ typedef enum {
                 // 動画の時間を生成（その画像の表示する時間。開始時点からの相対時間） a:0 b:3
                 CMTime frameTime = CMTimeMake((int64_t)frameCount * fps * durationForEachImage, fps);
                 
-                NSLog(@"orientation:%ld width:%f height:%f", (long)image.imageOrientation, image.size.width, image.size.height);
+                DEBUGLOG(@"orientation:%ld width:%f height:%f", (long)image.imageOrientation, image.size.width, image.size.height);
                 //UIImage *oriImage = [self rotateImage:image];
                 //buffer = [self pixelBufferFromCGImage:oriImage.CGImage withOrientation:oriImage.imageOrientation];
                 buffer = [self pixelBufferFromCGImage:image.CGImage withOrientation:image.imageOrientation size:image.size];
                 
                 if (![adaptor appendPixelBuffer:buffer withPresentationTime:frameTime]) {
-                    NSLog(@"Failed to append buffer. [image : %@]", image);
+                    DEBUGLOG(@"Failed to append buffer. [image : %@]", image);
                 }
                 
                 if(buffer) {
@@ -711,55 +714,72 @@ typedef enum {
                               (NSString *)kCVPixelBufferCGBitmapContextCompatibilityKey: @(YES),
                               };
     
-    CVPixelBufferRef pxbuffer = NULL;
+    CVPixelBufferRef buffer = NULL;
     // memo:orientationによって、image.size.widthと異なる(orientation:0のサイズを取っている?)
-    CGFloat width = CGImageGetWidth(image);
-    CGFloat height = CGImageGetHeight(image);
+    // image.size.xxxはorientationの情報を見て、システムが正常に回転した後の画像のxxxになっている（実際表示上の向き/xxxと同じ。デバイス/UIInterfaceなどの向きと関係ある）。
+    // CGImageGetxxxは実際のバッファーからxxxの情報を取得する。例えば、landscapeでキャプチャーした場合、実際のデータはlandscape形式で作成されるとので、デバイスがportraitで正常に表示されても、landscapeデータのxxxになる
+    CGFloat imageWidth = CGImageGetWidth(image);
+    CGFloat imageHeight = CGImageGetHeight(image);
     //CGFloat width = size.width;
     //CGFloat height = size.height;
     
-    NSLog(@"orientation:%ld width:%f height:%f", (long)orientation, width, height);
+    DEBUGLOG(@"UIImage orientation:%ld width:%f height:%f", (long)orientation, imageWidth, imageHeight);
     
     // ピクセルバッファを作成
     CVPixelBufferCreate(kCFAllocatorDefault,
-                        width,
-                        height,
+                        imageWidth,
+                        imageHeight,
                         kCVPixelFormatType_32ARGB,
                         (__bridge CFDictionaryRef)options,
-                        &pxbuffer);
+                        &buffer);
     
     // ピクセルバッファをロック(readonly:1?)
-    CVPixelBufferLockBaseAddress(pxbuffer, 0);
+    CVPixelBufferLockBaseAddress(buffer, 0);
     
     // ピクセルバッファのベースアドレスのポインタを返す(描画用)
-    void *pxdata = CVPixelBufferGetBaseAddress(pxbuffer);
+    void *base = CVPixelBufferGetBaseAddress(buffer);
+    size_t width = CVPixelBufferGetWidth(buffer);
+    size_t height = CVPixelBufferGetHeight(buffer);
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(buffer);
+    
+    // memo:CGImageGetxxxと同じ
+    DEBUGLOG(@"PixelImage width:%zu height:%zu bytesPerRow:%zu", width, height, bytesPerRow);
     
     // カラースペースとコンテキストの作成
     CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef context = CGBitmapContextCreate(pxdata,
+    // memo:向きはあくまでの付加？情報(正しく表示される向き)。実際物理(バッファー)データと向きの情報は異なる可能性がある。
+    // transform変換処理を行う場合、バッファーデータ（の向き：ピクセル？配置情報）を基準に変換する必要がある(contextが変換後描画できる配置にする)。
+    CGContextRef context = CGBitmapContextCreate(
+                                                 base,
                                                  width,
                                                  height,
                                                  8, // RGBのbit数
-                                                 4 * width, // size per line (bytes)
+                                                 //4 * width, // size per line (bytes) // 向き変換する時、heightになるので
+                                                 bytesPerRow,// 向きと関係ないかも。実際変換後の向きに合わせる必要がある
                                                  rgbColorSpace,
                                                  (CGBitmapInfo)kCGImageAlphaNoneSkipFirst);
     
 #if true
     // todo:orientationの情報がなくなる？ので、座標変換が必要？
+    // 存在する場合も、変換が必要（現状portrait表示にしているので、landscape->portraitが必要）
+    // 実際のorientaionのままvideoを作成し、再生時正しくtransformを設定すれば、正常に表示(QuickTime)される？が、
+    // apple以外の場合、向きが正常に表示されないかも。ビデオ(H264)の仕様であれば問題ない？(transformの情報があればFacebookなどでも正常に表示される？)
     switch (orientation) {
         // todo:orientation情報がある場合、上向きに表示されるはず(システムが左?/右?に回転して表示？)
         // 情報がなくなるので、基準方向(landscape/right)になるので、上向きに手動で90度回転(右?/左?)が必要
         // 座標系、デバイスの向き、画像向きなどの変換について調査!!!
-        case UIImageOrientationRight:
+        case UIImageOrientationRight:// カメラでLandescapleRightでキャプチャー
             CGContextTranslateCTM(context, width, height);
             CGContextScaleCTM(context, 1, -1);
             CGContextRotateCTM(context, M_PI_2);
             //CGContextTranslateCTM(context, -height, -width);// OK 変換順番要注意
             CGContextDrawImage(context, CGRectMake(0, 0, height, width), image);
             break;
-        case UIImageOrientationUp:
+        case UIImageOrientationUp:// Portraitキャプチャー。iOS以外で撮った写真でorientaion情報がない場合もここに入る
+            // context(空buffer)へimageを書き込み
             CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
         default:
+            // LandscapeLeft/Portraitキャプチャーした画像はとりあえず非サポート。エラー出すか画像非選択非するか
             break;
     }
     
@@ -827,9 +847,9 @@ typedef enum {
     CGContextRelease(context);
     
     // ピクセルバッファのロックを解除
-    CVPixelBufferUnlockBaseAddress(pxbuffer, 0);
+    CVPixelBufferUnlockBaseAddress(buffer, 0);
     
-    return pxbuffer;
+    return buffer;
 }
 
 //

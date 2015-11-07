@@ -10,7 +10,7 @@
 #define LEDSignalDetector_Log_h
 
 #ifndef DEBUG_LOG
-#define DEBUG_LOG
+//#define DEBUG_LOG
 #endif
 
 #ifdef DEBUG_LOG

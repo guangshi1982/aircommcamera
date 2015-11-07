@@ -8,6 +8,12 @@
 
 #import "AirImage.h"
 
+
+@implementation AirImageExif
+
+
+@end
+
 @implementation AirImage
 
 - (id)initWithItem:(FAItem *)item

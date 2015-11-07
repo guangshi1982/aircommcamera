@@ -9,11 +9,25 @@
 #import <Foundation/Foundation.h>
 
 typedef enum {
-    AirSensorTypeAcceleration = 1,
-    AirSensorTypeRotationRate = 2,
-    AirSensorTypeLocation     = 4,
-    AirSensorTypeActivity     = 8
+    AirSensorTypeNone         = 0x00,
+    AirSensorTypeAcceleration = 1 << 1,
+    AirSensorTypeRotationRate = 1 << 2,
+    AirSensorTypeLocation     = 1 << 3,
+    AirSensorTypeHeading      = 1 << 4,
+    AirSensorTypeActivity     = 1 << 5,
+    AirSensorTypeMagnetometer = 1 << 6,
+    AirSensorTypeGyro         = 1 << 7,
+    AirSensorTypeAttitude     = 1 << 8,
+    AirSensorTypeProximity    = 1 << 9,
 } AirSensorType;
+
+typedef enum {
+    AirSensorNotifyTypeAcceleration,
+    AirSensorNotifyTypeRotationRate,
+    AirSensorNotifyTypeLocationCoordinate,
+    AirSensorNotifyTypeLocationHeading,
+    AirSensorNotifyTypeActivity
+} AirSensorNotifyType;
 
 /*
 typedef struct {
@@ -70,10 +84,13 @@ typedef struct {
 
 @interface AirSensorLocation : NSObject
 
-@property (nonatomic) double heading;
+@property (nonatomic) double magneticHeading;
+@property (nonatomic) double trueHeading;
 @property (nonatomic) double headingX;
 @property (nonatomic) double headingY;
 @property (nonatomic) double headingZ;
+@property (nonatomic) double latitude;
+@property (nonatomic) double longitude;
 
 @end
 
@@ -110,16 +127,17 @@ typedef struct {
 @protocol AirSensorObserver <NSObject>
 
 @optional
-// 検知範囲(カメラ起動エリアなど)。GPS/磁気センサーで場所と方向で判断
--(void)isValidArea:(BOOL)valid rawInfo:(AirSensorInfo*)info;
+
 // カメラ画面表示するか。接近センサーで判断
 -(void)displayCameraView:(BOOL)flag info:(AirSensorInfo*)info;
 // カメラでキャプチャするか。加速度/ジャイロセンサーで判断
--(void)captureImage:(BOOL)flag info:(AirSensorInfo*)info;
-// debug
--(void)sensorInfo:(AirSensorInfo*)info;
+-(void)capture:(AirSensorInfo*)info;
+// raw info
+-(void)sensorInfo:(AirSensorInfo*)info ofType:(AirSensorNotifyType)type;
 
 @end
+
+
 
 // todo:汎用的にする
 @interface AirSensorManager : NSObject
@@ -127,7 +145,9 @@ typedef struct {
 @property (nonatomic, weak) id<AirSensorObserver> observer;
 
 +(AirSensorManager*)getInstance;
--(void)start:(AirSensorType)type;
--(void)stop:(AirSensorType)type;
+-(void)setSensorType:(AirSensorType)type;
+-(void)addSensorType:(AirSensorType)type;
+-(void)start;
+-(void)stop;
 
 @end

@@ -5,7 +5,6 @@
 #import "AirShowPlayerViewController.h"
 #import <QBImagePickerController/QBImagePickerController.h>
 #import <MBCircularProgressBar/MBCircularProgressBarView.h>
-#import "AirCameraManager.h"
 #import "AirImageManager.h"
 #import "AirShowManager.h"
 #import "AirFileManager.h"
@@ -16,6 +15,7 @@
 #import "AirSound.h"
 #import "AirShow.h"
 #import "AirFrame.h"
+#import "CameraCapture.h"
 #import "FAFlashAir.h"
 #import "FAItem.h"
 #import "Uploader.h"

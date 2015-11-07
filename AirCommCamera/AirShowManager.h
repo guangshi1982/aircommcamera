@@ -15,7 +15,7 @@
 @protocol AirShowObserver <NSObject>
 
 @optional
-- (void)progress:(float)progress inCreatingMovies:(NSString*)movieFolder;
+- (void)progress:(float)progress inCreatingMovies:(NSString*)movieFile inFolder:(NSString*)movieFolder;
 - (void)progress:(float)progress inAddingTextToMovie:(NSString*)moviePath;// connectingに統一
 - (void)progress:(float)progress inConnectingMovies:(NSString*)moviePath;
 //- (void)progress:(float)progress inAddingSoundToMovie:(NSString*)moviePath;

@@ -33,8 +33,8 @@
 - (id)init
 {
     if (self = [super init]) {
-        _flashAir = [[FAFlashAir alloc] initWithHostname:@"aircard.local"];
-        //_flashAir = [[FAFlashAir alloc] initWithHostname:@"192.168.0.1"];
+        //_flashAir = [[FAFlashAir alloc] initWithHostname:@"aircard.local"];
+        _flashAir = [[FAFlashAir alloc] initWithHostname:@"192.168.0.1"];
     }
     
     return self;

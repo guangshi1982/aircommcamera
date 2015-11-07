@@ -11,10 +11,12 @@ import UIKit
 
 class AirMovieCollectionViewController: UIViewController, UICollectionViewDelegate, UIScrollViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, AirShowObserver {
     
+    let QUEUE_SERIAL_CONNECT_MOVIE = "com.threees.aircomm.aircam.connect-movie"
     let identifierAirSoundViewController = "AirSoundViewController"
     let identifierAirMovieEditViewController = "AirMovieEditViewController"
     let reuseIdentifierMovieCell = "AirMovieCell"
     
+    @IBOutlet weak var nextBarButtonItem: UIBarButtonItem!
     @IBOutlet weak var airMovieCollectionView: UICollectionView!
     @IBOutlet weak var progressView: UIProgressView!
     
@@ -22,9 +24,11 @@ class AirMovieCollectionViewController: UIViewController, UICollectionViewDelega
     // todo:after?
     var airMovieFlolder: String?
     var airMovies: [AirMovie] = []
-    var airMovieCount: Int = 0;
     var seletectPath: NSIndexPath?
-
+    
+    // todo: create queue in AirShowManager?
+    var movieQueue: dispatch_queue_t?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         print("AirMovieCollectionViewController viewDidLoad")
@@ -37,8 +41,12 @@ class AirMovieCollectionViewController: UIViewController, UICollectionViewDelega
 
         // Do any additional setup after loading the view.
         self.airShowMan = AirShowManager.getInstance()
-        self.airShowMan!.observer = self
+        // memo: set in parent view controller(selected view controller)
+        //self.airShowMan!.observer = self
         
+        self.movieQueue = dispatch_queue_create(QUEUE_SERIAL_CONNECT_MOVIE, DISPATCH_QUEUE_SERIAL)
+        
+        self.nextBarButtonItem.enabled = false
         self.progressView.progress = 0.0
     }
     
@@ -52,7 +60,6 @@ class AirMovieCollectionViewController: UIViewController, UICollectionViewDelega
                 let airMovie: AirMovie = AirMovie(path: filePath)
                 self.airMovies.append(airMovie)
             }
-            self.airMovieCount = self.airMovies.count
         }
     }
 
@@ -73,6 +80,11 @@ class AirMovieCollectionViewController: UIViewController, UICollectionViewDelega
         if segue.identifier == self.identifierAirSoundViewController {
             let airSoundViewController = segue.destinationViewController as! AirSoundViewController
             airSoundViewController.videoPath = sender as? String
+            self.airShowMan?.observer = airSoundViewController
+            
+            dispatch_async(self.movieQueue!, { () -> Void in
+                self.airShowMan!.connectAirMovies(self.airMovies, movie: airSoundViewController.videoPath)
+            })
         } else if segue.identifier == self.identifierAirMovieEditViewController {
             let airMovieEditViewController = segue.destinationViewController as! AirMovieEditViewController
             let cell = sender as! AirMovieCell
@@ -141,6 +153,30 @@ class AirMovieCollectionViewController: UIViewController, UICollectionViewDelega
 
     // MARK: AirShowObserver
     
+    func progress(progress: Float, inCreatingMovies movieFile: String!, inFolder movieFolder: String!) {
+        // todo: add progress bar
+        print("CreatingMovie progress:\(progress)")
+        
+        let airMovie: AirMovie = AirMovie(path: movieFile)
+        self.airMovies.append(airMovie)
+        let indexPath = NSIndexPath(forItem: self.airMovies.count - 1, inSection: 0)
+        
+        dispatch_sync(dispatch_get_main_queue()) { () -> Void in
+            self.airMovieCollectionView.insertItemsAtIndexPaths([indexPath])
+            self.progressView.progress = progress
+            // todo:scroll to new movie
+            
+            if (progress == 100) {
+                self.progressView.progress = 0.0
+                self.nextBarButtonItem.enabled = true
+                // todo:scroll to first?
+                
+                self.airShowMan?.observer = nil
+            }
+        }
+    }
+    
+    /*
     func progress(progress: Float, inConnectingMovies moviePath: String!) {
         // todo: add progress bar
         print("ConnectingMovie progress:\(progress)")
@@ -148,13 +184,15 @@ class AirMovieCollectionViewController: UIViewController, UICollectionViewDelega
         if (progress == 100) {
             [self.performSegueWithIdentifier(self.identifierAirSoundViewController, sender: moviePath)]
         }
-    }
+    }*/
     
     // MARK: Action
     
     @IBAction func nextAction(sender: AnyObject) {
+        /*
         let moviePath = FileManager.getPathWithFileName("airmovie.mov", fromFolder: "airfolder/tmp/sound")
-        self.airShowMan!.connectAirMovies(self.airMovies, movie: moviePath)
+        self.airShowMan!.connectAirMovies(self.airMovies, movie: moviePath)*/
+        [self.performSegueWithIdentifier(self.identifierAirSoundViewController, sender: "airfolder/tmp/sound")]
     }
     
     @IBAction func addAction(sender: AnyObject) {

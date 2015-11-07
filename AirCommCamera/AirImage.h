@@ -9,11 +9,18 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "AirFile.h"
+#import "AirSensorManager.h"
 
 typedef enum : int64_t {
     AirImageEffectTypeNone,
     AirImageEffectTypeCustom,
 } AirImageEffectType;
+
+@interface AirImageExif : NSObject
+
+@property (nonatomic) AirSensorInfo *sensorInfo;
+
+@end
 
 @interface AirImage : AirFile
 
@@ -23,6 +30,7 @@ typedef enum : int64_t {
 //@property (nonatomic, copy) NSString *imageNameExt;
 @property (nonatomic) UIImage *image;
 @property (nonatomic) AirImageEffectType effectType;
+@property (nonatomic) AirImageExif *imageExif;
 
 - (id)initWithItem:(FAItem *)item;
 - (id)initWithImage:(UIImage*)image;

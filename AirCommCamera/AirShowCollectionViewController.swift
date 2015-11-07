@@ -23,12 +23,11 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
     
     var airShowMan: AirShowManager?
     var airFileMan: AirFileManager?
-    var airShowPath: String?
+    var airShowPath: String? // new air show path
     var airShowFlolder: String = "airshow"
     //var airShowFlolder: String = "airmovie" //test
     // todo: [AirShow]
     var airShows: [AnyObject] = []
-    var airShowCount: Int = 0;
     var seletectPath: NSIndexPath?
 
     override func viewDidLoad() {
@@ -44,8 +43,6 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
 
         // Do any additional setup after loading the view.
         self.airShowMan = AirShowManager.getInstance()
-        //self.airShowPath = FileManager.getSubDirectoryPath("airshow")
-        //self.airShowPath = FileManager.getSubDirectoryPath("airmovie") // test
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -53,9 +50,7 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
         
         // todo:update by event in which show created
         self.airShows = FileManager.getFilePathsInSubDir(self.airShowFlolder)
-        self.airShowCount = self.airShows.count
-        //self.airShowCount = Int(FileManager.getFileCountInSubDir(self.airShowFlolder))
-        print("airShowCount:\(self.airShowCount)")
+        print("airShowCount:\(self.airShows.count)")
     }
 
     override func didReceiveMemoryWarning() {
@@ -93,7 +88,7 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
 
 
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.airShowCount
+        return self.airShows.count
         //return 0 // test
     }
 
@@ -143,12 +138,6 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
     
     }
     */
-    
-    // MARK: AirShowObserver
-    
-    func progress(progress: Float, inCreatingMovie moviePath: String!) {
-        
-    }
     
     
     // MARK: QBImagePickerControllerDelegate
@@ -404,15 +393,18 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
     
     @IBAction func unwindBackToShowCollectionController(unwindSegue: UIStoryboardSegue) {
         // todo:unwindSegue.sourceViewController.isKindOfClass()
-        //let showPath = "" // from sourceViewController?(add property)
-        //self.airShows.append(showPath)
-        //let indexPath = NSIndexPath(forItem: self.airShows.count, inSection: 0)
-        //self.collectionView?.insertItemsAtIndexPaths([indexPath])
         
+        if let path = self.airShowPath {
+            self.airShows.append(path)
+            let indexPath = NSIndexPath(forItem: self.airShows.count - 1, inSection: 0)
+            self.collectionView?.insertItemsAtIndexPaths([indexPath])
+        }
+        
+        /*
         self.airShows = FileManager.getFilePathsInSubDir(self.airShowFlolder)
         self.airShowCount = self.airShows.count
         self.collectionView?.reloadData()
-        
+        */
     }
 
 }

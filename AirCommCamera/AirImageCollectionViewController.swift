@@ -13,6 +13,8 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
     let identifierAirImageCell = "AirImageCell"
     let identifierAirShowCollectionViewController = "AirShowCollectionViewController"
     let identifierAirShowNavigationController = "AirShowNavigationController"
+    let identifierAirLocalCameraViewController = "AirLocalCameraViewController"
+    let identifierAirCameraViewController = "AirCameraViewController"
     let identifierAirProgressViewController = "AirProgressViewController"
     let numberOfColumns: CGFloat = 4
     
@@ -22,6 +24,8 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
     var airShowMan: AirShowManager?
     var airImageMan: AirImageManager?
     var progressOfProcess: Float = 0.0
+    
+    var pathType: Int = 0 // TBD 0:local 1:flashair
     
     var airProgressViewController: AirProgressViewController!
 
@@ -37,40 +41,44 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
         //self.collectionView!.registerClass(UICollectionViewCell.self, forCellWithReuseIdentifier: identifierAirImageCell)
 
         // Do any additional setup after loading the view.
-        self.airFileMan = AirFileManager.getInstance()
+        
         self.airShowMan = AirShowManager.getInstance()
         self.airShowMan!.observer = self
         
         self.airImageMan = AirImageManager.getInstance()
         
-        // async
-        let airImages: [AirImage]? = self.airFileMan?.imagesAtDirectory(self.parentDir) as? [AirImage]
-        if (airImages != nil) {
-            for airImage in airImages! {
-                let fileData: NSData? = self.airFileMan?.getFileData(airImage.filePath)
-                let image: UIImage? = UIImage(data: fileData!)
-                airImage.image = image
-                self.airImages.append(airImage)
-                /*
-                let bounds = CGRect(origin: CGPointZero, size: airImage.image.size)
-                let faceInfos: [DetectInfo]? = airImageMan?.detectFace(airImage.image, inBounds: bounds) as? [DetectInfo]
-                
-                if (faceInfos != nil && faceInfos?.count > 0) {
+        print("self.parentDir:\(self.parentDir)")
+        
+        // todo:async
+        if (self.pathType == 0) {
+            let filePaths: [String]? = FileManager.getFilePathsInSubDir(self.parentDir) as? [String]
+            if filePaths != nil {
+                for filePath in filePaths! {
+                    let airImage: AirImage = AirImage(path: filePath)
+                    self.airImages.append(airImage)
+                }
+            }
+        } else {
+            self.airFileMan = AirFileManager.getInstance()
+            let airImages: [AirImage]? = self.airFileMan?.imagesAtDirectory(self.parentDir) as? [AirImage]
+            if (airImages != nil) {
+                for airImage in airImages! {
+                    let fileData: NSData? = self.airFileMan?.getFileData(airImage.filePath)
+                    let image: UIImage? = UIImage(data: fileData!)
+                    airImage.image = image
+                    self.airImages.append(airImage)
+                    /*
+                    let bounds = CGRect(origin: CGPointZero, size: airImage.image.size)
+                    let faceInfos: [DetectInfo]? = airImageMan?.detectFace(airImage.image, inBounds: bounds) as? [DetectInfo]
+                    
+                    if (faceInfos != nil && faceInfos?.count > 0) {
                     print("face detected")
                     self.airImages.append(airImage)
-                }*/
+                    }*/
+                }
             }
         }
-        // test
-        /*
-        print("self.parentDir:\(self.parentDir)")
-        let filePaths: [String]? = FileManager.getFilePathsInSubDir(self.parentDir) as? [String]
-        if filePaths != nil {
-            for filePath in filePaths! {
-                let airImage: AirImage = AirImage(path: filePath)
-                self.airImages.append(airImage)
-            }
-        }*/
+        
         print("self.airImages.count:\(self.airImages.count)")
     }
 
@@ -89,14 +97,18 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Get the new view controller using [segue destinationViewController].
         // Pass the selected object to the new view controller.
-        print("prepareForSegue[AirImageSelectedCollection]")
+        print("prepareForSegue[AirImageCollectionViewController]")
         
         print("identifier: \(segue.identifier)")
         if segue.identifier == self.identifierAirShowNavigationController {
             let airShowNavigationController = segue.destinationViewController as! UINavigationController
             let airImageSelectedViewController: AirImageSelectedViewController = airShowNavigationController.topViewController as! AirImageSelectedViewController
+            airImageSelectedViewController.airImages = sender as! [AirImage]
             
             airImageSelectedViewController.airImages = self.airImages
+        } else if segue.identifier == self.identifierAirShowCollectionViewController {
+            let airShowCollectionViewController = segue.destinationViewController as! AirShowCollectionViewController
+            airShowCollectionViewController.airShowPath = sender as? String
         }
     }
 
@@ -168,7 +180,7 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
     
     // MARK: AirShowObserver
     
-    func progress(progress: Float, inCreatingMovies movieFolder: String!) {
+    func progress(progress: Float, inCreatingMovies movieFile: String!, inFolder movieFolder: String!) {
         print("CreatingMovie progress:\(progress)")
         
         self.progress(progress, ratioOf: 1.0 / 2)
@@ -226,7 +238,11 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
         }
     }
     
-    func progress(progress: Float, ratioOf ratio: Float) {
+    func progress(progress: Float, inProcessingShow showPath: String!) {
+        
+    }
+    
+    private func progress(progress: Float, ratioOf ratio: Float) {
         let progressOfAll = self.progressOfProcess + progress * ratio
         
         if (progress == 100) {
@@ -240,7 +256,7 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
     
     // MARK: Action
     
-    @IBAction func autoCrete(sender: AnyObject) {
+    @IBAction func autoCreate(sender: AnyObject) {
         FileManager.deleteSubFolder("airfolder/tmp")
         FileManager.createSubFolder("airfolder/tmp/image/before")// original images
         FileManager.createSubFolder("airfolder/tmp/image/after")// for effect
@@ -256,4 +272,24 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
         }
     }
 
+    @IBAction func cancelAction(sender: AnyObject) {
+        if (self.pathType == 0) {
+            self.performSegueWithIdentifier(self.identifierAirLocalCameraViewController, sender: nil)
+        } else if (self.pathType == 1) {
+            self.performSegueWithIdentifier(self.identifierAirCameraViewController, sender: nil)
+        }
+    }
+    
+    @IBAction func doneAction(sender: AnyObject) {
+        // no segue id (it's storyboard id)
+        //self.performSegueWithIdentifier(self.identifierAirShowNavigationController, sender: self.airImages)
+        
+        let airShowNavigationController: UINavigationController = self.storyboard!.instantiateViewControllerWithIdentifier(self.identifierAirShowNavigationController) as! UINavigationController
+        let airImageSelectedViewController: AirImageSelectedViewController = airShowNavigationController.topViewController as! AirImageSelectedViewController
+        airImageSelectedViewController.airImages = self.airImages
+        
+        self.presentViewController(airShowNavigationController, animated: true) { () -> Void in
+            print("AirShowNavigationController")
+        }
+    }
 }
