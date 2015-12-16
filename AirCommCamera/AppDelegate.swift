@@ -19,6 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // 一時フォルダ作成. @memo tmpではないとNG
         FileManager.createRootFolder("tmp")
+        FileManager.createSubFolder("airfolder")
         FileManager.createSubFolder("airimage")
         FileManager.createSubFolder("airmovie")
         FileManager.createSubFolder("airshow")
@@ -48,6 +49,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-
+    /* memo:set in info.plist. this delegate prefers
+    func application(application: UIApplication, supportedInterfaceOrientationsForWindow window: UIWindow?) -> UIInterfaceOrientationMask {
+        
+    }*/
 }
 

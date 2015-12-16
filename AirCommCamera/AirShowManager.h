@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "AirFrame.h"
 #import "AirImage.h"
 #import "AirMovie.h"
 #import "AirSound.h"
@@ -16,6 +17,7 @@
 
 @optional
 - (void)progress:(float)progress inCreatingMovies:(NSString*)movieFile inFolder:(NSString*)movieFolder;
+- (void)progress:(float)progress inTransformingMovies:(NSString*)movieFile inFolder:(NSString*)movieFolder;
 - (void)progress:(float)progress inAddingTextToMovie:(NSString*)moviePath;// connectingに統一
 - (void)progress:(float)progress inConnectingMovies:(NSString*)moviePath;
 //- (void)progress:(float)progress inAddingSoundToMovie:(NSString*)moviePath;
@@ -30,16 +32,21 @@
 
 + (AirShowManager*)getInstance;
 // todo:画像処理追加
-- (void)createAirMovieWithAirImage:(AirImage*)airImage movie:(NSString*)moviePath;
+- (void)createAirMovieWithAirFrame:(AirFrame*)airFrame movie:(NSString*)moviePath;
+- (void)createAirMovieWithAirImage:(AirImage*)airImage movie:(NSString*)movieName inFolder:(NSString*)movieFolder;
 - (void)createAirMoviesWithAirImages:(NSArray*)airImages movies:(NSString*)movieFolder;
+- (void)transformAirMovies:(NSArray*)airMovies movies:(NSString*)movieFolder;
+- (void)connectAirMovie:(AirMovie*)firstMovie toAnother:(AirMovie*)secondMovie movie:(NSString*)moviePath;
+- (void)connectAirMovieToCurrent:(AirMovie*)airMovie;
 - (void)connectAirMovies:(NSArray*)airMovies movie:(NSString*)moviePath;
 //- (void)addSound:(AirSound*)airSound toMovie:(AirMovie*)airMovie;
 - (void)createAirShowFromAirMovie:(AirMovie*)airMovie withAirSound:(AirSound*)airSound show:(NSString*)showPath;
+- (void)createAirShowFromAirMovies:(NSArray*)airMovies withAirSound:(AirSound*)airSound toShow:(NSString*)showPath;
 // create with images automatically
 - (void)createShowWithAirImages:(NSArray*)airImages;
 
 //- (void)setSoundPath:(NSString*)soundPath showPath:(NSString*)showPath;
 - (void)createSlideShowWithImages:(NSArray *)images sound:(NSString*)soundPath show:(NSString*)showPath;
-- (UIImage*)thumbnailOfVideo:(NSString*)videoPath;
+- (UIImage*)thumbnailOfVideo:(NSString*)videoPath withSize:(CGSize)size;
 
 @end

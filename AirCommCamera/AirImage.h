@@ -16,6 +16,16 @@ typedef enum : int64_t {
     AirImageEffectTypeCustom,
 } AirImageEffectType;
 
+typedef enum {
+    AirImageAspectRatio4x3,
+    AirImageAspectRatio16x9,
+} AirImageAspectRatio;
+
+typedef enum {
+    AirImageSize1280x720,
+    AirImageSize1920x1080,
+} AirImageSize;
+
 @interface AirImageExif : NSObject
 
 @property (nonatomic) AirSensorInfo *sensorInfo;
@@ -34,5 +44,6 @@ typedef enum : int64_t {
 
 - (id)initWithItem:(FAItem *)item;
 - (id)initWithImage:(UIImage*)image;
+- (id)initWithData:(NSData*)data;
 
 @end

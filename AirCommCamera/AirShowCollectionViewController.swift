@@ -7,9 +7,10 @@
 //
 
 import UIKit
+import Social
 import QBImagePickerController
 
-class AirShowCollectionViewController: UICollectionViewController, QBImagePickerControllerDelegate, AirShowObserver {
+class AirShowCollectionViewController: UICollectionViewController, AirShowEditViewControllerDelegate, QBImagePickerControllerDelegate, AirShowObserver, AirFileManagerDelegate {
     
     let identifierAirShowCell = "AirShowCell"
     let identifierAirShowEditViewController = "AirShowEditViewController"
@@ -20,6 +21,10 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
     let identifierAirFolderCollectionViewController = "AirFolderCollectionViewController"
     let identifierAirActionNavigationController = "AirActionNavigationController"
     let identifierAirShowNavigationController = "AirShowNavigationController"
+    let identifierAirImageCollectionViewController = "AirImageCollectionViewController"
+    let identifierAirImageNavigationController = "AirImageNavigationController"
+    
+    let connectionMaxCount = 3;
     
     var airShowMan: AirShowManager?
     var airFileMan: AirFileManager?
@@ -27,8 +32,13 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
     var airShowFlolder: String = "airshow"
     //var airShowFlolder: String = "airmovie" //test
     // todo: [AirShow]
-    var airShows: [AnyObject] = []
+    var airShows: [String] = []
     var seletectPath: NSIndexPath?
+    
+    var airCameraConnTimer: NSTimer?
+    var connInterval: NSTimeInterval = 3
+    var connCount: Int = 0
+    var isConnected: Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,14 +53,18 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
 
         // Do any additional setup after loading the view.
         self.airShowMan = AirShowManager.getInstance()
+        self.airFileMan = AirFileManager.getInstance()
+        self.airFileMan?.delegate = self
+        
+        //self.airCameraConnTimer = NSTimer.scheduledTimerWithTimeInterval(self.connInterval, target: self, selector: Selector("connectToCamera:"), userInfo: nil, repeats: true)
+        
+        // todo:update by event in which show created
+        self.airShows = FileManager.getFilePathsInSubDir(self.airShowFlolder) as! [String]
+        print("airShowCount:\(self.airShows.count)")
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        // todo:update by event in which show created
-        self.airShows = FileManager.getFilePathsInSubDir(self.airShowFlolder)
-        print("airShowCount:\(self.airShows.count)")
     }
 
     override func didReceiveMemoryWarning() {
@@ -68,9 +82,13 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
         print("identifier: \(segue.identifier)")
         if segue.identifier == identifierAirShowEditViewController {
             let cell = sender as! AirShowCell
+            let selectedIndexpath = self.collectionView?.indexPathForCell(cell)
             let airshowPlayerController = segue.destinationViewController as! AirShowEditViewController
+            airshowPlayerController.delegate = self
             airshowPlayerController.videoPath = cell.airShowPath
-            airshowPlayerController.updateVideo()
+            airshowPlayerController.airShowFolder = self.airShows[selectedIndexpath!.row]
+            
+            //airshowPlayerController.updateVideo()
         } else if segue.identifier == identifierAirPreviewController {
             let cell = sender as! AirShowCell
             let airPreviewController = segue.destinationViewController as! AirPreviewController
@@ -86,8 +104,8 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
         return 1
     }
 
-
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        print(self.airShows.count)
         return self.airShows.count
         //return 0 // test
     }
@@ -97,9 +115,10 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
         
         // Configure the cell
         // todo:nil check
-        let showFolder = self.airShows[indexPath.row] as! String
+        let showFolder = self.airShows[indexPath.row] 
         let showPath = showFolder + "/" + "show/airshow.mov"
-        let thumbnail: UIImage? = self.airShowMan!.thumbnailOfVideo(showPath)
+        print(showPath)
+        let thumbnail: UIImage? = self.airShowMan!.thumbnailOfVideo(showPath, withSize: (cell.thumbnailImageView?.bounds.size)!)
         if (thumbnail != nil) {
             cell.thumbnailImageView!.image = thumbnail
             cell.airShowPath = showPath
@@ -139,6 +158,56 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
     }
     */
     
+    // todo: delete
+    func connectToCamera(timer: NSTimer) {
+        self.isConnected = (self.airFileMan?.isConnected())!
+        if (self.isConnected || self.connCount >= self.connectionMaxCount) {
+            if (self.isConnected) {
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    self.navigationItem.title = "Connected"
+                })
+            }
+            if ((self.airCameraConnTimer?.valid) != nil) {
+                self.airCameraConnTimer?.invalidate()
+            }
+        } else {
+            self.connCount++
+        }
+    }
+    
+    // MARK: AirFileManagerDelegate
+    
+    func airFileManager(manager: AirFileManager!, isConnected connection: Bool) {
+        var connState = "Disconnected"
+        
+        self.isConnected = connection
+        
+        if (connection) {
+            connState = "Connected"
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            self.navigationItem.title = connState
+        })
+    }
+    
+    // MARK: AirShowEditViewControllerDelegate
+    
+    func airShowEditViewController(airShowEditViewController: AirShowEditViewController, didFinishEditingAirshowAtPath path: String) {
+        
+    }
+    
+    func airShowEditViewController(airShowEditViewController: AirShowEditViewController, didFinishDeletingAirshowAtPath path: String) {
+        
+        for (var i = 0; i < self.airShows.count; i++) {
+            if self.airShows[i] == path {
+                self.airShows.removeAtIndex(i)
+                let deleteIndexpath = NSIndexPath(forItem: i, inSection: 0)
+                self.collectionView?.deleteItemsAtIndexPaths([deleteIndexpath])
+                break;
+            }
+        }
+    }
     
     // MARK: QBImagePickerControllerDelegate
     
@@ -185,6 +254,7 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
         self.dismissViewControllerAnimated(true, completion: { () -> Void in
             print("dismissImagePickerController")
             
+            #if false
             // memo:一旦前のviewをdismissする必要がある
             let airShowNavigationController: UINavigationController = self.storyboard!.instantiateViewControllerWithIdentifier(self.identifierAirShowNavigationController) as! UINavigationController
             let airImageSelectedViewController: AirImageSelectedViewController = airShowNavigationController.topViewController as! AirImageSelectedViewController
@@ -193,6 +263,24 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
             self.presentViewController(airShowNavigationController, animated: true) { () -> Void in
                 print("AirShowNavigationController")
             }
+                
+            #else // test
+            
+                //let airImageCollectionViewController = self.storyboard!.instantiateViewControllerWithIdentifier("AirImageCollectionViewController") as! AirImageCollectionViewController
+                //airImageCollectionViewController.parentDir = folderPath
+                let airNavigationController: UINavigationController = self.storyboard!.instantiateViewControllerWithIdentifier(self.identifierAirImageNavigationController) as! UINavigationController
+                let airImageCollectionViewController = airNavigationController.topViewController as! AirImageCollectionViewController
+                airImageCollectionViewController.airImages = airImages
+                airImageCollectionViewController.pathType = 2
+                // memo:storyboardでnavigationcontrollerにrootviewcontrollerを設定していない場合、コード上でcontrollerを作ってpushする
+                //airNavigationController.pushViewController(airImageCollectionViewController, animated: false)
+                
+                // todo:custom segue
+                // memo: not airimagecontroller
+                self.presentViewController(airNavigationController, animated: true) { () -> Void in
+                    print("AirImageCollectionViewController")
+                }
+            #endif
         })
     }
     
@@ -254,7 +342,7 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
         airImage.image = UIImage(named: "1.jpg")
         airImage.fileName = "1"
         let moviePath = FileManager.getPathWithFileName(String(format: "%@.mov", airImage.fileName), fromFolder: "airfolder/tmp/movie")
-        airShowMan.createAirMovieWithAirImage(airImage, movie: moviePath)
+        airShowMan.createAirMovieWithAirImage(airImage, movie: String(format: "%@.mov", airImage.fileName), inFolder: "airfolder/tmp/movie")
         
     }
     
@@ -266,7 +354,8 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
         FileManager.deleteSubFolder("airfolder/tmp")
         FileManager.createSubFolder("airfolder/tmp/image/before")// original images
         FileManager.createSubFolder("airfolder/tmp/image/after")// for effect
-        FileManager.createSubFolder("airfolder/tmp/movie") // transition or none (from images with effect). And connected movie named [airmovie.xxx]
+        FileManager.createSubFolder("airfolder/tmp/movie") // none effect(from images with ). And connected movie named [airmovie.xxx]
+        FileManager.createSubFolder("airfolder/tmp/transform") // transition
         //FileManager.createSubFolder("airfolder/tmp/movie/before") // original movies from images with effect
         //FileManager.createSubFolder("airfolder/tmp/movie/after")// for transition
         //FileManager.createSubFolder("airfolder/tmp/movie/connected")
@@ -281,13 +370,28 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
         // added in iOS8
         let actionSheet = UIAlertController(title: "Create slide show", message: "Select images from below", preferredStyle: UIAlertControllerStyle.ActionSheet)
         
-        let cameraButtonAction = UIAlertAction(title: "Camera", style: UIAlertActionStyle.Default) { (action) -> Void in
-            print("Camera")
+        let localCameraButtonAction = UIAlertAction(title: "Camera", style: UIAlertActionStyle.Default) { (action) -> Void in
+            print("LocalCamera")
             
             let airLocalCameraViewController: AirLocalCameraViewController = self.storyboard!.instantiateViewControllerWithIdentifier(self.identifierAirLocalCameraViewController) as! AirLocalCameraViewController
             
             self.presentViewController(airLocalCameraViewController, animated: true) { () -> Void in
                 print("AirLocalCameraViewController")
+            }
+        }
+        
+        // todo:Add to LocalCamera and switch from LocalCamera (SegmentedControl)
+        var airCameraTitle = "AirCamera"
+        if (!self.isConnected) {
+            airCameraTitle = "AirCamera(Disconnected)"
+        }
+        let airCameraButtonAction = UIAlertAction(title: airCameraTitle, style: UIAlertActionStyle.Default) { (action) -> Void in
+            print("AirCamera")
+            
+            let airCameraViewController: AirCameraViewController = self.storyboard!.instantiateViewControllerWithIdentifier(self.identifierAirCameraViewController) as! AirCameraViewController
+            
+            self.presentViewController(airCameraViewController, animated: true) { () -> Void in
+                print("AirCameraViewController")
             }
         }
         
@@ -316,10 +420,12 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
             })
         }
         
+        // todo:Add to AirFolder
         let snsButtonAction = UIAlertAction(title: "SNS", style: UIAlertActionStyle.Default) { (action) -> Void in
             print("SNS")
         }
         
+        // todo:Add to AirFolder
         let flashairButtonAction = UIAlertAction(title: "FlashAir", style: UIAlertActionStyle.Default) { (action) -> Void in
             print("FlashAir")
             
@@ -338,9 +444,9 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
             //FileManager.deleteSubFolder("airfolder/tmp")
         }
         
-        actionSheet.addAction(cameraButtonAction)
+        actionSheet.addAction(localCameraButtonAction)
         actionSheet.addAction(photosButtonAction)
-        actionSheet.addAction(snsButtonAction)
+        actionSheet.addAction(airCameraButtonAction)
         actionSheet.addAction(flashairButtonAction)
         actionSheet.addAction(cancelButtonAction)
         
@@ -351,7 +457,22 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
     }
     
     @IBAction func shareAirShow(sender: AnyObject) {
+        let showFolder = self.airShows[0] 
+        let showPath = showFolder + "/" + "show/airshow.mov"
+        let videoLink = NSURL(fileURLWithPath: showPath)
+        //let items = ["test", videoLink]
+        let items = [videoLink, "test"]
+        let activityViewController = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        activityViewController.setValue("Share video", forKey: "Subject")
+        activityViewController.completionWithItemsHandler = { activityType, completed, returnedItems, error in
+            if (completed) {
+                print("completed")
+            }
+        }
         
+        self.presentViewController(activityViewController, animated: true) { () -> Void in
+            print("UIActivityViewController")
+        }
     }
     
     @IBAction func captureAirCamera(sender: AnyObject) {
@@ -394,10 +515,18 @@ class AirShowCollectionViewController: UICollectionViewController, QBImagePicker
     @IBAction func unwindBackToShowCollectionController(unwindSegue: UIStoryboardSegue) {
         // todo:unwindSegue.sourceViewController.isKindOfClass()
         
-        if let path = self.airShowPath {
-            self.airShows.append(path)
-            let indexPath = NSIndexPath(forItem: self.airShows.count - 1, inSection: 0)
-            self.collectionView?.insertItemsAtIndexPaths([indexPath])
+        print(self.airShowPath)
+        if let folder = self.airShowPath {
+            let newShowPath = FileManager.getSubDirectoryPath(folder)
+            //self.airShows.append(newShowPath)
+            //let insertIndexpath = NSIndexPath(forItem: self.airShows.count - 1, inSection: 0)
+            self.airShows.insert(newShowPath, atIndex: 0)
+            let insertIndexpath = NSIndexPath(forItem: 0, inSection: 0)
+            // todo:遷移元でmainスレッドにしている
+            //dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            self.collectionView?.insertItemsAtIndexPaths([insertIndexpath])
+            //})
+            self.airShowPath = nil
         }
         
         /*

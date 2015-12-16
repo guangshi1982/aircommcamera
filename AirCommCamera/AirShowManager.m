@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import "AirShowManager.h"
+#import "AirImageManager.h"
 #import "FileManager.h"
 #import "Log.h"
 
@@ -45,6 +46,10 @@ typedef enum {
 @property (nonatomic, copy) NSString* movieFolder;
 @property (nonatomic) NSArray* airImages;
 @property (nonatomic) int movieCount;
+@property (nonatomic) NSArray* airMovies;
+//@property (nonatomic) NSMutableArray* transformAirMovies;
+
+@property (nonatomic) AirImageManager *imageMan;
 
 @end
 
@@ -71,22 +76,38 @@ typedef enum {
         [FileManager createSubFolder:@"airfolder/tmp/airshow"];*/
 //        _movPath = [FileManager getPathWithFileName:@"tmp.mov" fromFolder:@"/airmovie"];
         //_writerObserber = self;
+        //_transformAirMovies = [NSMutableArray array];
+        _imageMan = [AirImageManager getInstance];
     }
     
     return self;
 }
 
-- (void)createAirMovieWithAirImage:(AirImage*)airImage movie:(NSString*)moviePath
+- (void)createAirMovieWithAirFrame:(AirFrame*)airFrame movie:(NSString*)moviePath
 {
-    if (airImage != nil && moviePath != nil) {
-        //moviePath = [FileManager getPathWithFileName:[NSString stringWithFormat:@"tmp%d.mov", 1] fromFolder:@"/airmovie"];
+    if (airFrame != nil && moviePath != nil) {
+        //   _movieFolder = movieFolder;
+        //_airImages = @[airImage];
+        _movieCount = 0;
+        [self writeSampleBufferToMovie:airFrame.pixelBuffer toPath:moviePath];
+    }
+}
+
+- (void)createAirMovieWithAirImage:(AirImage*)airImage movie:(NSString*)movieName inFolder:(NSString*)movieFolder
+{
+    if (airImage != nil && movieName != nil && movieFolder != nil) {
+        NSString *moviePath = [FileManager getPathWithFileName:movieName fromFolder:movieFolder];
+        _movieFolder = movieFolder;
+        _airImages = @[airImage];
+        _movieCount = 0;
         [self writeImageToMovie:airImage.image toPath:moviePath];
     }
 }
 
 - (void)createAirMoviesWithAirImages:(NSArray*)airImages movies:(NSString*)movieFolder
 {
-    if (airImages != nil && movieFolder != nil) {
+    NSLog(@"createAirMoviesWithAirImages");
+    if (airImages != nil && airImages.count > 0 && movieFolder != nil) {
         _movieFolder = movieFolder;
         _airImages = airImages;
         _movieCount = 0;
@@ -97,19 +118,47 @@ typedef enum {
     }
 }
 
+- (void)transformAirMovies:(NSArray*)airMovies movies:(NSString*)movieFolder
+{
+    NSLog(@"transformAirMovies");
+    if (airMovies != nil && airMovies.count > 0 && movieFolder != nil) {
+        _movieFolder = movieFolder;
+        _airMovies = airMovies;
+        _movieCount = 0;
+        
+        if (_movieCount < [_airMovies count]) {
+            [self startTransformMovie];
+        }
+    }
+}
+
+- (void)connectAirMovie:(AirMovie*)firstMovie toAnother:(AirMovie*)secondMovie movie:(NSString*)moviePath
+{
+    if (firstMovie != nil && secondMovie != nil) {
+        NSArray *airMovies = @[firstMovie, secondMovie];
+        [self connectMovies:airMovies movie:moviePath];
+    }
+}
+
+- (void)connectAirMovieToCurrent:(AirMovie*)airMovie
+{
+    
+}
+
 - (void)connectAirMovies:(NSArray*)airMovies movie:(NSString*)moviePath
 {
-    if (airMovies != nil && moviePath != nil) {
+    if (airMovies != nil && airMovies.count > 0 && moviePath != nil) {
         //NSString *moviePath = [FileManager getPathWithFileName:@"airmovie.mov" fromFolder:@"/airfolder/tmp/airmovie/connection"];
-        NSMutableArray *movieList = [[NSMutableArray alloc] init];
+        /*NSMutableArray *movieList = [[NSMutableArray alloc] init];
         for (int i = 0; i < [airMovies count]; i++) {
             AirMovie *airMovie = [airMovies objectAtIndex:i];
             if (airMovie != nil) {
                 [movieList addObject:airMovie.filePath];
             }
-        }
+        }*/
         
-        [self connectMovies:movieList movie:moviePath];
+        //[self connectMovies:movieList movie:moviePath];
+        [self connectMovies:airMovies movie:moviePath];
     }
 }
 
@@ -118,6 +167,13 @@ typedef enum {
     if (airMovie != nil && airSound != nil && showPath != nil) {
         //NSString *moviePath = [FileManager getPathWithFileName:@"airsound.mov" fromFolder:@"/airfolder/tmp/airsound/before"];
         [self addSoundToMovie:airMovie.filePath sound:airSound.filePath show:showPath];
+    }
+}
+
+- (void)createAirShowFromAirMovies:(NSArray*)airMovies withAirSound:(AirSound*)airSound toShow:(NSString*)showPath
+{
+    if (airMovies != nil && airSound != nil && showPath != nil) {
+        [self addSoundToAirMovies:airMovies sound:airSound.filePath show:showPath];
     }
 }
 
@@ -138,13 +194,16 @@ typedef enum {
  
 
 // todo:set image size?
-- (UIImage*)thumbnailOfVideo:(NSString*)videoPath
+- (UIImage*)thumbnailOfVideo:(NSString*)videoPath withSize:(CGSize)size
 {
     NSLog(@"thumbnailOfVideo start");
     
     NSURL *videoUrl = [NSURL fileURLWithPath:videoPath];
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:videoUrl options:nil];
     AVAssetImageGenerator *imageGenerator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    // todo:解像度が良くないな
+    //imageGenerator.maximumSize = CGSizeMake(size.width * 2, size.height * 2);
+    //imageGenerator.maximumSize = size;
     
     //Float64 durationSeconds = CMTimeGetSeconds([asset duration]);
     CMTime firstpoint = CMTimeMakeWithSeconds(0, 600);
@@ -153,11 +212,15 @@ typedef enum {
     CGImageRef firstImage = [imageGenerator copyCGImageAtTime:firstpoint
                                                      actualTime:&actualTime error:&error];
     
+    // todo:maximumSize通りになる。scaleなど設定ても反映さえないようだ？
     UIImage *thumnail = [UIImage imageWithCGImage:firstImage];
+    //UIImage *thumnail = [UIImage imageWithCGImage:firstImage scale:2 orientation:UIImageOrientationUp];
     CGImageRelease(firstImage);
     
     NSLog(@"thumbnailOfVideo end");
     
+    //return [_imageMan resizeImage:thumnail size:size];
+    //return [_imageMan resizeImageWithSameRatio:thumnail size:size];
     return thumnail;
 }
 
@@ -213,16 +276,51 @@ typedef enum {
 {
     NSLog(@"writeCompleted:[%d]", _movieCount);
     
+    _movieCount++;
+    float progress = (float)(_movieCount) / [_airImages count];
     if (_observer != nil) {
         if ([_observer respondsToSelector:@selector(progress:inCreatingMovies:inFolder:)]) {
-            float progress = (float)(_movieCount + 1) / [_airImages count];
             [_observer progress:progress * 100 inCreatingMovies:moviePath inFolder:_movieFolder];
         }
     }
     
-    _movieCount++;
-    if (_movieCount < [_airImages count]) {
+    if (progress < 1) {
         [self startCreateMovie];
+    }
+    
+    /*AirMovie *airMovie = [[AirMovie alloc] initWithPath:moviePath];
+    NSString *moviePath = [FileManager getPathWithFileName:[NSString stringWithFormat: @"%@_t.mov", airMovie.fileName] fromFolder:_movieFolder];
+    [self transformAirMovie:airMovie toPath:moviePath];
+     */
+}
+
+- (void)startTransformMovie
+{
+    NSLog(@"startTransformMovie");
+    
+    AirMovie *airMovie = (AirMovie*)_airMovies[_movieCount];
+    NSString *moviePath = [FileManager getPathWithFileName:[NSString stringWithFormat: @"%@.mov", airMovie.fileName] fromFolder:_movieFolder];
+    
+    if (airMovie != nil && moviePath != nil) {
+        [self transformAirMovie:airMovie toPath:moviePath];
+    }
+}
+
+- (void)transformMovieCompleted:(NSString*)moviePath
+{
+    NSLog(@"transformMovieCompleted:[%d]", _movieCount);
+    
+    _movieCount++;
+    float progress = (float)(_movieCount) / [_airMovies count];
+    if (_observer != nil) {
+        if ([_observer respondsToSelector:@selector(progress:inTransformingMovies:inFolder:)]) {
+            [_observer progress:progress * 100 inTransformingMovies:moviePath inFolder:_movieFolder];
+        }
+    }
+    
+    
+    if (progress < 1) {
+        [self startTransformMovie];
     }
 }
 
@@ -334,6 +432,130 @@ typedef enum {
 }
 
 // 画像から動画作成(音声なし/横モードに調整)
+- (void)writeSampleBufferToMovie:(CVPixelBufferRef)pixelBuffer toPath:(NSString*)path
+{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    
+    // 既にファイルがある場合は削除する
+    if ([fileManager fileExistsAtPath:path]) {
+        [fileManager removeItemAtPath:path error:nil];
+    }
+    
+    NSError *error = nil;
+    
+    self.videoWriter = [[AVAssetWriter alloc] initWithURL:[NSURL fileURLWithPath:path]
+                                                 fileType:AVFileTypeQuickTimeMovie
+                                                    error:&error];
+    
+    if (error) {
+        NSLog(@"%@", [error localizedDescription]);
+        return;
+    }
+    
+    //CVPixelBufferRef pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    CVPixelBufferLockBaseAddress(pixelBuffer, 0);
+    size_t width = CVPixelBufferGetWidth(pixelBuffer);
+    size_t height = CVPixelBufferGetHeight(pixelBuffer);
+    
+    DEBUGLOG(@"width:%zu height:%zu", width, height);
+    
+    // memo:(form apple doc)圧縮済みvideoの場合、AVVideoxxxで設定(一部除いて、非圧縮videoに設定するとエラーになるようだ)
+    // 圧縮されていないvideoの場合、kCVPixelBufferで設定
+    NSDictionary *outputSettings =
+    @{
+      AVVideoCodecKey  : AVVideoCodecH264,
+      AVVideoWidthKey  : @(width),
+      AVVideoHeightKey : @(height),
+      };
+    
+    // memo:変更せずにそのまま出力する場合、AVFileTypeQuickTimeMovieの前提で、outputSettingsにnilを設定してもOK
+    AVAssetWriterInput *writerInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:outputSettings];
+    
+    // AVCaptureOutputの場合、YESにする必要がある
+    //writerInput.expectsMediaDataInRealTime = YES;
+    writerInput.expectsMediaDataInRealTime = NO;
+    // todo:必要に応じて回転(landscape capture -> xxx)
+    NSLog(@"writerInput.transform(before):%@", NSStringFromCGAffineTransform(writerInput.transform));
+    writerInput.transform = CGAffineTransformIdentity;
+    
+    if ([self.videoWriter canAddInput:writerInput]) {
+        [self.videoWriter addInput:writerInput];
+    }
+    
+#if true
+    NSDictionary *sourcePixelBufferAttributes =
+    @{
+      (NSString *)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32ARGB),
+      (NSString *)kCVPixelBufferWidthKey           : @(width),
+      (NSString *)kCVPixelBufferHeightKey          : @(height),
+      };
+#else
+    NSDictionary *sourcePixelBufferAttributes =
+    @{
+      (NSString *)kCVPixelBufferCGImageCompatibilityKey : [NSNumber numberWithBool:YES],
+      (NSString *)kCVPixelBufferCGBitmapContextCompatibilityKey : [NSNumber numberWithBool:YES],
+      (NSString *)kCVPixelBufferPixelFormatTypeKey : [NSNumber numberWithInt:kCVPixelFormatType_32ARGB]};
+#endif
+    
+    AVAssetWriterInputPixelBufferAdaptor *adaptor = [AVAssetWriterInputPixelBufferAdaptor
+                                                     assetWriterInputPixelBufferAdaptorWithAssetWriterInput:writerInput
+                                                     sourcePixelBufferAttributes:sourcePixelBufferAttributes];
+    
+    // 生成開始できるか確認
+    // todo:backgroundでは失敗するので、中止する必要がある？
+    if (![self.videoWriter startWriting]) {
+        NSLog(@"Failed to start writing!@%ld", (long)self.videoWriter.status);
+        NSLog(@"error:%@", self.videoWriter.error);
+        return;
+    }
+    
+    // 動画生成開始
+    [self.videoWriter startSessionAtSourceTime:kCMTimeZero];
+    
+    // 現在のフレームカウント
+    int frameCount = 0;
+    // 各画像の表示する時間
+    int durationForEachImage = 2;
+    int32_t fps = kVideoFPS;
+    
+    // memo:1枚の画像の場合、なぜか時間が0になってしまう。裏技？として同じ画像を２回書き出す(2sx2=4s)
+    // todo:int型なので、奇数秒数の場合、1+2=3sの用に２倍ではなく、バラバラにする方法を取る(関数化)
+    for (int i = 0; i < 2; i++) {
+        @autoreleasepool {
+            if (adaptor.assetWriterInput.readyForMoreMediaData) {
+                // 動画の時間を生成（その画像の表示する時間。開始時点からの相対時間） a:0 b:3
+                CMTime frameTime = CMTimeMake((int64_t)frameCount * fps * durationForEachImage, fps);
+                
+                if (![adaptor appendPixelBuffer:pixelBuffer withPresentationTime:frameTime]) {
+                    //DEBUGLOG(@"Failed to append buffer. [image : %@]", image);
+                }
+                
+                frameCount++;
+            }
+        }
+    }
+    
+    // 動画生成終了
+    [writerInput markAsFinished];
+    //[self.videoWriter endSessionAtSourceTime:CMTimeMake((int64_t)fps * durationForEachImage, fps)];
+    //[self.videoWriter endSessionAtSourceTime:CMTimeMake((int64_t)frameCount * fps * durationForEachImage, fps)];
+    NSLog(@"writerInput.transform(after):%@", NSStringFromCGAffineTransform(writerInput.transform));
+    
+    [self.videoWriter finishWritingWithCompletionHandler:^{
+        NSLog(@"Finish writing!@%ld", (long)self.videoWriter.status);
+        if (self.videoWriter.status == AVAssetWriterStatusCompleted) {
+            [self writeMovieCompleted:path];// create next
+        } else {
+            // todo:失敗して、呼ばれない場合、メモリリーク?(videoWriterは解放されない?)
+            self.videoWriter = nil;
+        }
+    }];
+    
+    CVPixelBufferPoolRelease(adaptor.pixelBufferPool);
+    CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
+}
+
+// 画像から動画作成(音声なし/横モードに調整)
 - (void)writeImageToMovie:(UIImage*)image toPath:(NSString*)path
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -344,7 +566,31 @@ typedef enum {
     }
     
     // 最初の画像から動画のサイズ指定する
-    CGSize size = image.size;
+    //CGSize size = image.size;
+    CGFloat width = image.size.width;
+    CGFloat height = image.size.height;
+    DEBUGLOG(@"image orientation(before crop):%ld width:%f height:%f", (long)image.imageOrientation, width, height);
+    
+#if true // memo:横縦向きの判断が面倒？なので、ビデオ作成後の結合時、transformで向きを判断して、縦向きの場合、切り出す
+         // 結合時エフェクトも入れるので、kCMTimeZeroで設定し、その他affineとand演算が必要。ここで切った方が、後処理でパフォーマンスが良いかも
+         // 横キャプチャ(buffer width > height)で、iPhoneカメラの場合、縦向きで撮影(orien:Right)
+         //                                     AirCamera(基本bufferは横)の場合、横向き撮影になっていうようだ(orien:0 Upかそもそも入っていない)
+    // todo:とりあえずLandscapeRightキャプチャ、PortraitUpデバイスの状態で撮影された状態を想定
+    // 16:9横モードに切り取る。画像を切る取るか、witdh/heightを設定すれば良いか？
+    image = [self.imageMan clipImage:image atOrigin:CGPointMake(0, 0) withAspectRatio:AirImageAspectRatio16x9];
+    width = image.size.width;
+    height = image.size.height;
+#else
+    width = image.size.width;
+    //CGFloat height = (image.size.width * 9) / 16;
+    height = image.size.width * 0.5625;
+    
+    // todo:bufferは横向きなので、実際bufferから切り出す時、width/heightが逆になる
+    image = [self.imageMan clipImage:image rect:CGRectMake(0, 0, height, width)];
+    
+#endif
+    
+    DEBUGLOG(@"image orientation(after crop):%ld width:%f height:%f", (long)image.imageOrientation, width, height);
     
     NSError *error = nil;
     
@@ -360,23 +606,32 @@ typedef enum {
     NSDictionary *outputSettings =
     @{
       AVVideoCodecKey  : AVVideoCodecH264,
-      AVVideoWidthKey  : @(size.width),
-      AVVideoHeightKey : @(size.height),
+      AVVideoWidthKey  : @(width),
+      AVVideoHeightKey : @(height),
       };
     
+    // memo:変更せずにそのまま出力する場合、AVFileTypeQuickTimeMovieの前提で、outputSettingsにnilを設定してもOK
     AVAssetWriterInput *writerInput = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:outputSettings];
-    //writerInput.transform
+    
+    // AVCaptureOutputの場合、YESにする必要がある
+    //writerInput.expectsMediaDataInRealTime = YES;
+    writerInput.expectsMediaDataInRealTime = NO;
+    // todo:必要に応じて回転(landscape capture -> xxx)
+    NSLog(@"writerInput.transform(before):%@", NSStringFromCGAffineTransform(writerInput.transform));
+    writerInput.transform = CGAffineTransformIdentity;
     
     if ([self.videoWriter canAddInput:writerInput]) {
         [self.videoWriter addInput:writerInput];
     }
     
 #if true
+    // todo:画質が微妙なので、他のパラメータも設定してみる
     NSDictionary *sourcePixelBufferAttributes =
     @{
+      // memo:videocaputure:BGRA sampleBuffer:BGRA image:ARGB
       (NSString *)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32ARGB),
-      (NSString *)kCVPixelBufferWidthKey           : @(size.width),
-      (NSString *)kCVPixelBufferHeightKey          : @(size.height),
+      (NSString *)kCVPixelBufferWidthKey           : @(width),
+      (NSString *)kCVPixelBufferHeightKey          : @(height),
       };
 #else
     NSDictionary *sourcePixelBufferAttributes =
@@ -389,8 +644,6 @@ typedef enum {
     AVAssetWriterInputPixelBufferAdaptor *adaptor = [AVAssetWriterInputPixelBufferAdaptor
                                                      assetWriterInputPixelBufferAdaptorWithAssetWriterInput:writerInput
                                                      sourcePixelBufferAttributes:sourcePixelBufferAttributes];
-    
-    writerInput.expectsMediaDataInRealTime = YES;
     
     // 生成開始できるか確認
     if (![self.videoWriter startWriting]) {
@@ -460,6 +713,7 @@ typedef enum {
     [writerInput markAsFinished];
     //[self.videoWriter endSessionAtSourceTime:CMTimeMake((int64_t)fps * durationForEachImage, fps)];
     //[self.videoWriter endSessionAtSourceTime:CMTimeMake((int64_t)frameCount * fps * durationForEachImage, fps)];
+    NSLog(@"writerInput.transform(after):%@", NSStringFromCGAffineTransform(writerInput.transform));
     
     [self.videoWriter finishWritingWithCompletionHandler:^{
         NSLog(@"Finish writing!@%ld", (long)self.videoWriter.status);
@@ -716,20 +970,20 @@ typedef enum {
     
     CVPixelBufferRef buffer = NULL;
     // memo:orientationによって、image.size.widthと異なる(orientation:0のサイズを取っている?)
-    // image.size.xxxはorientationの情報を見て、システムが正常に回転した後の画像のxxxになっている（実際表示上の向き/xxxと同じ。デバイス/UIInterfaceなどの向きと関係ある）。
+    // image.size.xxxはorientationの情報を見て、システムが正常に回転した後の画像のxxxになっている（実際表示上の向きのxxxと同じ。デバイス/UIInterfaceなどの向きと関係ある）。
     // CGImageGetxxxは実際のバッファーからxxxの情報を取得する。例えば、landscapeでキャプチャーした場合、実際のデータはlandscape形式で作成されるとので、デバイスがportraitで正常に表示されても、landscapeデータのxxxになる
     CGFloat imageWidth = CGImageGetWidth(image);
     CGFloat imageHeight = CGImageGetHeight(image);
     //CGFloat width = size.width;
     //CGFloat height = size.height;
     
-    DEBUGLOG(@"UIImage orientation:%ld width:%f height:%f", (long)orientation, imageWidth, imageHeight);
+    DEBUGLOG(@"UIImage orientation(before):%ld width:%f height:%f", (long)orientation, imageWidth, imageHeight);
     
     // ピクセルバッファを作成
     CVPixelBufferCreate(kCFAllocatorDefault,
                         imageWidth,
                         imageHeight,
-                        kCVPixelFormatType_32ARGB,
+                        kCVPixelFormatType_32ARGB,// 4byte -> size:imageWidth * 4 * imageHeight
                         (__bridge CFDictionaryRef)options,
                         &buffer);
     
@@ -740,10 +994,10 @@ typedef enum {
     void *base = CVPixelBufferGetBaseAddress(buffer);
     size_t width = CVPixelBufferGetWidth(buffer);
     size_t height = CVPixelBufferGetHeight(buffer);
-    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(buffer);
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(buffer);//imageWidth * 4
     
     // memo:CGImageGetxxxと同じ
-    DEBUGLOG(@"PixelImage width:%zu height:%zu bytesPerRow:%zu", width, height, bytesPerRow);
+    DEBUGLOG(@"PixelImage(before) width:%zu height:%zu bytesPerRow:%zu", width, height, bytesPerRow);
     
     // カラースペースとコンテキストの作成
     CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
@@ -753,7 +1007,7 @@ typedef enum {
                                                  base,
                                                  width,
                                                  height,
-                                                 8, // RGBのbit数
+                                                 8, // RGBのbit数(メモリ内のピクセルの各成分に使用するビット数) bitsPerComponent
                                                  //4 * width, // size per line (bytes) // 向き変換する時、heightになるので
                                                  bytesPerRow,// 向きと関係ないかも。実際変換後の向きに合わせる必要がある
                                                  rgbColorSpace,
@@ -764,16 +1018,23 @@ typedef enum {
     // 存在する場合も、変換が必要（現状portrait表示にしているので、landscape->portraitが必要）
     // 実際のorientaionのままvideoを作成し、再生時正しくtransformを設定すれば、正常に表示(QuickTime)される？が、
     // apple以外の場合、向きが正常に表示されないかも。ビデオ(H264)の仕様であれば問題ない？(transformの情報があればFacebookなどでも正常に表示される？)
-    switch (orientation) {
+    switch (orientation) {// todo:座標系は左上になっているようだ??
         // todo:orientation情報がある場合、上向きに表示されるはず(システムが左?/右?に回転して表示？)
         // 情報がなくなるので、基準方向(landscape/right)になるので、上向きに手動で90度回転(右?/左?)が必要
         // 座標系、デバイスの向き、画像向きなどの変換について調査!!!
         case UIImageOrientationRight:// カメラでLandescapleRightでキャプチャー
-            CGContextTranslateCTM(context, width, height);
-            CGContextScaleCTM(context, 1, -1);
+            /*CGContextTranslateCTM(context, width, height);
+            CGContextScaleCTM(context, 1, -1);// 左右反転になる
+            CGContextRotateCTM(context, M_PI_2);*/
+            //CGContextTranslateCTM(context, -height, -width);// OK 変換順番要注意(上記と同じ)
+            /*
+            CGContextTranslateCTM(context, width, 0);
             CGContextRotateCTM(context, M_PI_2);
-            //CGContextTranslateCTM(context, -height, -width);// OK 変換順番要注意
+             */ // 180回転になっている。ただ、左右反転になっていない。座標系は左上のようだ？？
+            CGContextTranslateCTM(context, 0, height);
+            CGContextRotateCTM(context, -M_PI_2);
             CGContextDrawImage(context, CGRectMake(0, 0, height, width), image);
+            //CGContextDrawImage(context, CGRectMake(0, 0, width, height), image);
             break;
         case UIImageOrientationUp:// Portraitキャプチャー。iOS以外で撮った写真でorientaion情報がない場合もここに入る
             // context(空buffer)へimageを書き込み
@@ -782,6 +1043,20 @@ typedef enum {
             // LandscapeLeft/Portraitキャプチャーした画像はとりあえず非サポート。エラー出すか画像非選択非するか
             break;
     }
+    
+    width = CVPixelBufferGetWidth(buffer);
+    height = CVPixelBufferGetHeight(buffer);
+    bytesPerRow = CVPixelBufferGetBytesPerRow(buffer);
+    
+    // memo:CGImageGetxxxと同じ
+    DEBUGLOG(@"PixelImage(after) width:%zu height:%zu bytesPerRow:%zu", width, height, bytesPerRow);
+    
+    imageWidth = CGImageGetWidth(image);
+    imageHeight = CGImageGetHeight(image);
+    //CGFloat width = size.width;
+    //CGFloat height = size.height;
+    
+    DEBUGLOG(@"UIImage orientation(after):%ld width:%f height:%f", (long)orientation, imageWidth, imageHeight);
     
 #endif
     
@@ -1165,6 +1440,169 @@ typedef enum {
     }];
 }
 
+// 複数の動画(横モード)と音声を合成
+// use two AVMutableCompositionTracks for all movies
+// videoA -> transition -> videoB ...
+- (void)addSoundToAirMovies:(NSArray*)airMovies sound:(NSString*)soundPath show:(NSString*)showPath
+{
+    NSError *error;
+    
+    //
+    AVMutableComposition *composition = [AVMutableComposition composition];
+    // todo:最大15個?。特別な処理がなければ、基本１個の方が良い?音声でBGMなどを入れる場合、複数で良いかも
+    AVMutableCompositionTrack *compositionVideoTracks[2];
+    compositionVideoTracks[0] = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    compositionVideoTracks[1] = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    
+    NSMutableArray *videoTracks = [NSMutableArray array];
+    NSMutableArray *instructions = [NSMutableArray array];
+    CGSize movSize = CGSizeZero;
+    CMTime movNextStartTime = kCMTimeZero;
+    // todo:AVMutableCompositionTrackは何個まで？15?
+    for (int i = 0; i < airMovies.count; i++) {
+        int index = i % 2; // alternating targets: 0, 1, 0, 1, ...
+        AirMovie *airMovie = [airMovies objectAtIndex:i];
+        NSString *movPath = airMovie.filePath;
+        NSLog(@"movPath:%@", movPath);
+        NSURL *inputURL = [NSURL fileURLWithPath:movPath];
+        AVURLAsset *videoAsset = [[AVURLAsset alloc] initWithURL:inputURL options:nil];
+        AVAssetTrack *videoTrack = [videoAsset tracksWithMediaType:AVMediaTypeVideo][0];
+        //CMTimeRange videoRange = CMTimeRangeMake(kCMTimeZero, videoTrack.timeRange.duration);
+        CMTimeRange videoRange = videoTrack.timeRange;
+        
+        // memo:videoTrackのvideoRangeの部分をcompositionVideoTranckのmovStartTimeに挿入
+        [compositionVideoTracks[index] insertTimeRange:videoRange ofTrack:videoTrack atTime:movNextStartTime error:&error];
+        //[compositionVideoTrack setPreferredTransform:videoTrack.preferredTransform];
+        
+        [videoTracks addObject:videoTrack];
+        
+        if (i == 0) {
+            movSize = videoTrack.naturalSize;
+        }
+        
+        /*
+         CGSize videoSize = videoTrack.naturalSize;
+         CGAffineTransform transform = videoTrack.preferredTransform;
+         if (transform.a == 0 && transform.d == 0 && (transform.b == 1.0 || transform.b == -1.0) && (transform.c == 1.0 || transform.c == -1.0))
+         {
+         videoSize = CGSizeMake(videoSize.height, videoSize.width);
+         }
+         */
+        
+        // set min of size?
+        if (videoTrack.naturalSize.width < movSize.width) {
+            movSize.width = videoTrack.naturalSize.width;
+        }
+        if (videoTrack.naturalSize.height < movSize.height) {
+            movSize.height = videoTrack.naturalSize.height;
+        }
+        
+        CMTimeRange effectRange = CMTimeRangeMake(CMTimeAdd(movNextStartTime, airMovie.transformInfo.transitionInTime), airMovie.transformInfo.effectTime);
+        if (i == 0) {// include in transition for first video
+            //effectRange = CMTimeRangeMake(movStartTime, CMTimeAdd(airMovie.transform.transitionInTime, airMovie.transform.effectTime));
+            effectRange.start = movNextStartTime;
+            effectRange.duration = CMTimeAdd(airMovie.transformInfo.transitionInTime, airMovie.transformInfo.effectTime);
+        } else if (i == airMovies.count - 1) {// include out transition for last video
+            effectRange.duration = CMTimeAdd(airMovie.transformInfo.effectTime, airMovie.transformInfo.transitionOutTime);
+        }
+        
+        // next movie start time
+        movNextStartTime = CMTimeAdd(movNextStartTime, CMTimeAdd(airMovie.transformInfo.transitionInTime, airMovie.transformInfo.effectTime));
+        //movStartTime = CMTimeSubtract(movStartTime, airMovie.transform.transitionOutTime);
+    }
+    
+    //
+    NSURL *soundURL = [NSURL fileURLWithPath:soundPath];
+    AVURLAsset *soundAsset = [[AVURLAsset alloc] initWithURL:soundURL options:nil];
+    AVAssetTrack *soundTrack = [soundAsset tracksWithMediaType:AVMediaTypeAudio][0];
+    AVMutableCompositionTrack *compositionSoundTrack = [composition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+    [compositionSoundTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, movNextStartTime) ofTrack:soundTrack atTime:kCMTimeZero error:&error];
+    
+    movNextStartTime = kCMTimeZero;
+    for (int i = 0; i < airMovies.count; i++) {
+        int index = i % 2; // alternating targets: 0, 1, 0, 1, ...
+        AirMovie *airMovie = [airMovies objectAtIndex:i];
+        
+        CMTimeRange effectRange = CMTimeRangeMake(CMTimeAdd(movNextStartTime, airMovie.transformInfo.transitionInTime), airMovie.transformInfo.effectTime);
+        if (i == 0) {// include in transition for first video
+            //effectRange = CMTimeRangeMake(movStartTime, CMTimeAdd(airMovie.transform.transitionInTime, airMovie.transform.effectTime));
+            effectRange.start = movNextStartTime;
+            effectRange.duration = CMTimeAdd(airMovie.transformInfo.transitionInTime, airMovie.transformInfo.effectTime);
+        } else if (i == airMovies.count - 1) {// include out transition for last video
+            effectRange.duration = CMTimeAdd(airMovie.transformInfo.effectTime, airMovie.transformInfo.transitionInTime);
+        }
+        
+        // todo:add effect
+        //AVMutableVideoCompositionLayerInstruction *layerInstructionEffect = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTracks[index]];
+        AVMutableVideoCompositionLayerInstruction *layerInstructionEffect = [self movieTransformLayerInstruction:airMovie.transformInfo type:airMovie.transformInfo.effectType transformRange:effectRange forCompositionTrack:compositionVideoTracks[index]];
+        
+        AVMutableVideoCompositionInstruction *instructionEffect = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+        instructionEffect.timeRange = effectRange;
+        instructionEffect.layerInstructions = @[layerInstructionEffect];
+        [instructions addObject:instructionEffect];
+        
+        // next movie start time
+        movNextStartTime = CMTimeAdd(movNextStartTime, CMTimeAdd(airMovie.transformInfo.transitionInTime, airMovie.transformInfo.effectTime));
+        //movStartTime = CMTimeSubtract(movStartTime, airMovie.transform.transitionOutTime);
+        
+        // for transition with in/out video
+        if (i + 1 < airMovies.count) {// except last video
+            // todo:add transition
+            CMTimeRange transitionRange = CMTimeRangeMake(movNextStartTime, airMovie.transformInfo.transitionOutTime);
+            //AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionIn = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTracks[index]];
+            AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionFrom = [self movieTransformLayerInstruction:airMovie.transformInfo type:airMovie.transformInfo.effectType | airMovie.transformInfo.transitionTypeOut transformRange:transitionRange forCompositionTrack:compositionVideoTracks[index]];
+            
+            AirMovie *airMovieTo = [airMovies objectAtIndex:i];
+            //AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionOut = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTracks[1 - index]];
+            AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionTo = [self movieTransformLayerInstruction:airMovie.transformInfo type:airMovieTo.transformInfo.transitionTypeIn transformRange:transitionRange forCompositionTrack:compositionVideoTracks[1 - index]];
+            
+            AVMutableVideoCompositionInstruction *instructionTransition = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+            instructionTransition.timeRange = transitionRange;
+            // todo:layerのカスタムがないので、arrayに追加した順にvideoが表示される。effectは各videoの設定になる。やっぱりここでlayoutInstruction設定したほうが良い
+            //instructionTransition.layerInstructions = [NSArray arrayWithObjects:layerInstructionTransitionOut, layerInstructionTransitionIn, nil];
+            instructionTransition.layerInstructions = [NSArray arrayWithObjects:layerInstructionTransitionFrom, layerInstructionTransitionTo, nil];
+            [instructions addObject:instructionTransition];
+        }
+    }
+    
+    AVMutableVideoComposition *videoComposition = [AVMutableVideoComposition videoComposition];
+    videoComposition.renderSize = movSize;
+    //videoComposition.instructions = @[instruction];
+    videoComposition.instructions = instructions;
+    videoComposition.frameDuration = CMTimeMake(1, kVideoFPS);
+    
+    NSLog(@"showPath:%@", showPath);
+    NSFileManager *fm = [NSFileManager defaultManager];
+    if ([fm fileExistsAtPath:showPath])
+    {
+        [fm removeItemAtPath:showPath error:&error];
+    }
+    
+    // memo:simのバグ.実機ではOK
+    AVAssetExportSession *session = [[AVAssetExportSession alloc] initWithAsset:composition
+                                     //presetName:AVAssetExportPresetPassthrough];
+                                                                     presetName:AVAssetExportPresetHighestQuality];
+    
+    session.outputURL = [NSURL fileURLWithPath:showPath];
+    session.outputFileType = AVFileTypeQuickTimeMovie;
+    session.shouldOptimizeForNetworkUse = YES;
+    session.videoComposition = videoComposition;
+    
+    [session exportAsynchronouslyWithCompletionHandler:^{
+        NSLog(@"Complete export!%ld", (long)session.status);
+        if (session.status == AVAssetExportSessionStatusCompleted){
+            NSLog(@"output complete!");
+            if (_observer != nil) {
+                if ([_observer respondsToSelector:@selector(progress:inCreatingShow:)]) {
+                    [_observer progress:100 inCreatingShow:showPath];
+                }            }
+        } else {
+            NSLog(@"output error! : %@", session.error);
+        }
+    }];
+}
+
+
 // 複数の動画を合成
 // memo:
 // 複数のvideo(AVAssetTrack)を一つのAVMutableCompositionTrackに繋げる(timeRange:各video atTime:xxxComxxxTrackで当該track開始時間)
@@ -1198,7 +1636,385 @@ typedef enum {
  * CompositionInstructionで管理するLayerは異なるCompositionTrackで生成されることがある(重なるCompositionTrackの場合とか)。
  * 複数のCompositionInstructionを生成するのは可能だが(境界線での動作がスムーズではない？)、複数のLayerで管理した方が良い。
  */
-- (void)connectMovies:(NSArray*)movPathList movie:(NSString*)moviePath
+
+- (void)transformAirMovie:(AirMovie*)airMovie toPath:(NSString*)moviePath
+{
+    NSError *error;
+    
+    // AVMutableComposition
+    AVMutableComposition *composition = [AVMutableComposition composition];
+    AVMutableCompositionTrack *compositionVideoTrack = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    
+    // AVAssetTrack
+    NSURL *inputURL = [NSURL fileURLWithPath:airMovie.filePath];
+    AVURLAsset *videoAsset = [[AVURLAsset alloc] initWithURL:inputURL options:nil];
+    AVAssetTrack *videoTrack = [videoAsset tracksWithMediaType:AVMediaTypeVideo][0];
+    //CMTimeRange videoRange = CMTimeRangeMake(kCMTimeZero, videoTrack.timeRange.duration);
+    CMTimeRange videoRange = videoTrack.timeRange;
+    
+    // memo:videoTrackのvideoRangeの部分をcompositionVideoTrackのkCMTimeZeroに挿入
+    [compositionVideoTrack insertTimeRange:videoRange ofTrack:videoTrack atTime:kCMTimeZero error:&error];
+    //[compositionVideoTrack setPreferredTransform:videoTrack.preferredTransform];
+    
+    NSArray *layerInstructions = [self movieTransitionLayerInstruction:airMovie.transformInfo OfTrack:videoTrack startTime:kCMTimeZero forCompositionTrack:compositionVideoTrack];
+    
+    AVMutableVideoCompositionInstruction *instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+    instruction.timeRange = videoRange;
+    //instruction.timeRange = CMTimeRangeMake(kCMTimeZero, videoTrack.timeRange.duration);
+    instruction.layerInstructions = layerInstructions;
+    
+    AVMutableVideoComposition *videoComposition = [AVMutableVideoComposition videoComposition];
+    videoComposition.renderSize = videoTrack.naturalSize;
+    videoComposition.instructions = @[instruction];
+    videoComposition.frameDuration = CMTimeMake(1, kVideoFPS);
+    
+    // todo: use FileManager
+    NSFileManager *fm = [NSFileManager defaultManager];
+    if ([fm fileExistsAtPath:moviePath])
+    {
+        [fm removeItemAtPath:moviePath error:&error];
+    }
+    
+    // memo:simのバグ.実機ではOK
+    AVAssetExportSession *session = [[AVAssetExportSession alloc] initWithAsset:composition
+                                     //presetName:AVAssetExportPresetPassthrough];
+                                                                     presetName:AVAssetExportPresetHighestQuality];
+    
+#if false
+    // Set the desired output URL for the file created by the export process.
+    // Create a static date formatter so we only have to initialize it once.
+    static NSDateFormatter *kDateFormatter;
+    if (!kDateFormatter) {
+        kDateFormatter = [[NSDateFormatter alloc] init];
+        kDateFormatter.dateStyle = NSDateFormatterMediumStyle;
+        kDateFormatter.timeStyle = NSDateFormatterShortStyle;
+    }
+    
+    session.outputURL = [[[[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory
+                                                                 inDomain:NSUserDomainMask
+                                                        appropriateForURL:nil
+                                                                   create:@YES
+                                                                    error:nil]
+                          URLByAppendingPathComponent:[kDateFormatter stringFromDate:[NSDate date]]]
+                         URLByAppendingPathExtension:CFBridgingRelease(UTTypeCopyPreferredTagWithClass((CFStringRef)AVFileTypeQuickTimeMovie, kUTTagClassFilenameExtension))];
+#endif
+    
+    session.outputURL = [NSURL fileURLWithPath:moviePath];
+    session.outputFileType = AVFileTypeQuickTimeMovie;
+    session.shouldOptimizeForNetworkUse = YES;
+    session.videoComposition = videoComposition;
+    
+    [session exportAsynchronouslyWithCompletionHandler:^{
+#if true
+        NSLog(@"Complete export!%ld", (long)session.status);
+        if (session.status == AVAssetExportSessionStatusCompleted){
+            NSLog(@"output complete!");
+            [self transformMovieCompleted:moviePath];
+        } else {
+            NSLog(@"output error! : %@", session.error);
+        }
+        
+#else
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (session.status == AVAssetExportSessionStatusCompleted){
+                NSLog(@"output complete!");
+                ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
+                if ([assetsLibrary videoAtPathIsCompatibleWithSavedPhotosAlbum:exporter.outputURL]) {
+                    [assetsLibrary writeVideoAtPathToSavedPhotosAlbum:exporter.outputURL completionBlock:NULL];
+                }
+            }
+        });
+#endif
+    }];
+}
+
+// use two AVMutableCompositionTracks for all movies
+// videoA -> transition -> videoB ...
+- (void)connectMovies:(NSArray*)airMovies movie:(NSString*)moviePath
+{
+    NSError *error;
+    
+    //
+    AVMutableComposition *composition = [AVMutableComposition composition];
+    // todo:最大15個?。特別な処理がなければ、基本１個の方が良い?音声でBGMなどを入れる場合、複数で良いかも
+    AVMutableCompositionTrack *compositionVideoTracks[2];
+    compositionVideoTracks[0] = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    compositionVideoTracks[1] = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    
+    NSMutableArray *videoTracks = [NSMutableArray array];
+    NSMutableArray *instructions = [NSMutableArray array];
+    CGSize movSize = CGSizeZero;
+    CMTime movStartTime = kCMTimeZero;
+    // todo:AVMutableCompositionTrackは何個まで？15?
+    for (int i = 0; i < airMovies.count; i++) {
+        int index = i % 2; // alternating targets: 0, 1, 0, 1, ...
+        AirMovie *airMovie = [airMovies objectAtIndex:i];
+        NSString *movPath = airMovie.filePath;
+        NSLog(@"movPath:%@", movPath);
+        NSURL *inputURL = [NSURL fileURLWithPath:movPath];
+        AVURLAsset *videoAsset = [[AVURLAsset alloc] initWithURL:inputURL options:nil];
+        AVAssetTrack *videoTrack = [videoAsset tracksWithMediaType:AVMediaTypeVideo][0];
+        //CMTimeRange videoRange = CMTimeRangeMake(kCMTimeZero, videoTrack.timeRange.duration);
+        CMTimeRange videoRange = videoTrack.timeRange;
+        
+        // memo:videoTrackのvideoRangeの部分をcompositionVideoTranckのmovStartTimeに挿入
+        [compositionVideoTracks[index] insertTimeRange:videoRange ofTrack:videoTrack atTime:movStartTime error:&error];
+        //[compositionVideoTrack setPreferredTransform:videoTrack.preferredTransform];
+        
+        [videoTracks addObject:videoTrack];
+        
+        if (i == 0) {
+            movSize = videoTrack.naturalSize;
+        }
+        
+        /*
+         CGSize videoSize = videoTrack.naturalSize;
+         CGAffineTransform transform = videoTrack.preferredTransform;
+         if (transform.a == 0 && transform.d == 0 && (transform.b == 1.0 || transform.b == -1.0) && (transform.c == 1.0 || transform.c == -1.0))
+         {
+         videoSize = CGSizeMake(videoSize.height, videoSize.width);
+         }
+         */
+        
+        // set min of size?
+        if (videoTrack.naturalSize.width < movSize.width) {
+            movSize.width = videoTrack.naturalSize.width;
+        }
+        if (videoTrack.naturalSize.height < movSize.height) {
+            movSize.height = videoTrack.naturalSize.height;
+        }
+        
+        CMTimeRange effectRange = CMTimeRangeMake(CMTimeAdd(movStartTime, airMovie.transformInfo.transitionInTime), airMovie.transformInfo.effectTime);
+        if (i == 0) {// include in transition for first video
+            //effectRange = CMTimeRangeMake(movStartTime, CMTimeAdd(airMovie.transform.transitionInTime, airMovie.transform.effectTime));
+            effectRange.start = movStartTime;
+            effectRange.duration = CMTimeAdd(airMovie.transformInfo.transitionInTime, airMovie.transformInfo.effectTime);
+        } else if (i == airMovies.count - 1) {// include out transition for last video
+            effectRange.duration = CMTimeAdd(airMovie.transformInfo.effectTime, airMovie.transformInfo.transitionOutTime);
+        }
+        
+#if false
+        // todo:add effect
+        AVMutableVideoCompositionLayerInstruction *layerInstructionEffect = [self movieTransformLayerInstruction:airMovie.transformInfo.effectType OfTrack:videoTrack transformRange:effectRange forCompositionTrack:compositionVideoTracks[index]];
+        
+        AVMutableVideoCompositionInstruction *instructionEffect = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+        instructionEffect.timeRange = effectRange;
+        instructionEffect.layerInstructions = @[layerInstructionEffect];
+        [instructions addObject:instructionEffect];
+        
+        
+        // for transition with in/out video
+        if (i > 0) {// except first video
+            // todo:add transition
+            CMTimeRange transitionRange = CMTimeRangeMake(movStartTime, airMovie.transformInfo.transitionInTime);
+            //AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionFrom = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTracks[1 - index]];
+            AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionFrom = [self movieTransformLayerInstruction:airMovie.transformInfo.effectType OfTrack:videoTrack transformRange:transitionRange forCompositionTrack:compositionVideoTracks[1 - index]];
+            //AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionTo = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTracks[index]];
+            AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionTo = [self movieTransformLayerInstruction:airMovie.transformInfo.effectType OfTrack:videoTrack transformRange:transitionRange forCompositionTrack:compositionVideoTracks[index]];
+            
+            AVMutableVideoCompositionInstruction *instructionTransition = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+            instructionTransition.timeRange = transitionRange;
+            // todo:layerのカスタムがないので、arrayに追加した順にvideoが表示される。effectは各videoの設定になる。やっぱりここでlayoutInstruction設定したほうが良い
+            //instructionTransition.layerInstructions = [NSArray arrayWithObjects:layerInstructionTransitionOut, layerInstructionTransitionIn, nil];
+            instructionTransition.layerInstructions = [NSArray arrayWithObjects:layerInstructionTransitionFrom, layerInstructionTransitionTo, nil];
+            [instructions addObject:instructionTransition];
+            [instructions insertObject:instructionTransition atIndex:[instructions count]];
+        }
+#endif
+        
+        // next movie start time
+        movStartTime = CMTimeAdd(movStartTime, CMTimeAdd(airMovie.transformInfo.transitionInTime, airMovie.transformInfo.effectTime));
+        //movStartTime = CMTimeSubtract(movStartTime, airMovie.transform.transitionOutTime);
+    }
+    
+#if false // memo:inertはダメか！！
+    movStartTime = kCMTimeZero;
+    for (int i = 0; i < airMovies.count; i++) {
+        int index = i % 2; // alternating targets: 0, 1, 0, 1, ...
+        AirMovie *airMovie = [airMovies objectAtIndex:i];
+        
+        CMTimeRange effectRange = CMTimeRangeMake(CMTimeAdd(movStartTime, airMovie.transform.transitionInTime), airMovie.transform.effectTime);
+        if (i == 0) {// include in transition for first video
+            //effectRange = CMTimeRangeMake(movStartTime, CMTimeAdd(airMovie.transform.transitionInTime, airMovie.transform.effectTime));
+            effectRange.start = movStartTime;
+            effectRange.duration = CMTimeAdd(airMovie.transform.transitionInTime, airMovie.transform.effectTime);
+        } else if (i == airMovies.count - 1) {// include out transition for last video
+            effectRange.duration = CMTimeAdd(airMovie.transform.effectTime, airMovie.transform.transitionInTime);
+        }
+        
+        AVMutableVideoCompositionLayerInstruction *layerInstructionEffect = [self movieTransformLayerInstruction:airMovie.transform.effectType OfTrack:nil transformRange:effectRange forCompositionTrack:compositionVideoTracks[index]];
+        
+        AVMutableVideoCompositionInstruction *instructionEffect = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+        instructionEffect.timeRange = effectRange;
+        instructionEffect.layerInstructions = @[layerInstructionEffect];
+        [instructions addObject:instructionEffect];
+        
+        
+        // for transition with in/out video
+        if (i > 0) {// except first video
+            // todo:add transition
+            CMTimeRange transitionRange = CMTimeRangeMake(movStartTime, airMovie.transform.transitionInTime);
+            //AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionFrom = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTracks[1 - index]];
+            AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionFrom = [self movieTransformLayerInstruction:airMovie.transform.effectType OfTrack:nil transformRange:transitionRange forCompositionTrack:compositionVideoTracks[1 - index]];
+            //AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionTo = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTracks[index]];
+            AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionTo = [self movieTransformLayerInstruction:airMovie.transform.effectType OfTrack:nil transformRange:transitionRange forCompositionTrack:compositionVideoTracks[index]];
+            
+            AVMutableVideoCompositionInstruction *instructionTransition = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+            instructionTransition.timeRange = transitionRange;
+            // todo:layerのカスタムがないので、arrayに追加した順にvideoが表示される。effectは各videoの設定になる。やっぱりここでlayoutInstruction設定したほうが良い
+            //instructionTransition.layerInstructions = [NSArray arrayWithObjects:layerInstructionTransitionOut, layerInstructionTransitionIn, nil];
+            instructionTransition.layerInstructions = [NSArray arrayWithObjects:layerInstructionTransitionFrom, layerInstructionTransitionTo, nil];
+            [instructions addObject:instructionTransition];
+            [instructions insertObject:instructionTransition atIndex:[instructions count]];
+        }
+        
+        // next movie start time
+        movStartTime = CMTimeAdd(movStartTime, CMTimeAdd(airMovie.transformInfo.transitionInTime, airMovie.transformInfo.effectTime));
+        //movStartTime = CMTimeSubtract(movStartTime, airMovie.transform.transitionOutTime);
+    }
+#else
+    movStartTime = kCMTimeZero;
+    for (int i = 0; i < airMovies.count; i++) {
+        int index = i % 2; // alternating targets: 0, 1, 0, 1, ...
+        AirMovie *airMovie = [airMovies objectAtIndex:i];
+    
+        CMTimeRange effectRange = CMTimeRangeMake(CMTimeAdd(movStartTime, airMovie.transformInfo.transitionInTime), airMovie.transformInfo.effectTime);
+        if (i == 0) {// include in transition for first video
+            //effectRange = CMTimeRangeMake(movStartTime, CMTimeAdd(airMovie.transform.transitionInTime, airMovie.transform.effectTime));
+            effectRange.start = movStartTime;
+            effectRange.duration = CMTimeAdd(airMovie.transformInfo.transitionInTime, airMovie.transformInfo.effectTime);
+        } else if (i == airMovies.count - 1) {// include out transition for last video
+            effectRange.duration = CMTimeAdd(airMovie.transformInfo.effectTime, airMovie.transformInfo.transitionInTime);
+        }
+        
+        // todo:add effect
+        //AVMutableVideoCompositionLayerInstruction *layerInstructionEffect = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTracks[index]];
+        AVMutableVideoCompositionLayerInstruction *layerInstructionEffect = [self movieTransformLayerInstruction:airMovie.transformInfo type:airMovie.transformInfo.effectType transformRange:effectRange forCompositionTrack:compositionVideoTracks[index]];
+        
+        AVMutableVideoCompositionInstruction *instructionEffect = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+        instructionEffect.timeRange = effectRange;
+        instructionEffect.layerInstructions = @[layerInstructionEffect];
+        [instructions addObject:instructionEffect];
+        
+        // next movie start time
+        movStartTime = CMTimeAdd(movStartTime, CMTimeAdd(airMovie.transformInfo.transitionInTime, airMovie.transformInfo.effectTime));
+        //movStartTime = CMTimeSubtract(movStartTime, airMovie.transform.transitionOutTime);
+        
+        // for transition with in/out video
+        if (i + 1 < airMovies.count) {// except last video
+            // todo:add transition
+            CMTimeRange transitionRange = CMTimeRangeMake(movStartTime, airMovie.transformInfo.transitionOutTime);
+            //AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionIn = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTracks[index]];
+            AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionFrom = [self movieTransformLayerInstruction:airMovie.transformInfo type:airMovie.transformInfo.effectType | airMovie.transformInfo.transitionTypeOut transformRange:transitionRange forCompositionTrack:compositionVideoTracks[index]];
+            
+            AirMovie *airMovieTo = [airMovies objectAtIndex:i];
+            //AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionOut = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTracks[1 - index]];
+            AVMutableVideoCompositionLayerInstruction *layerInstructionTransitionTo = [self movieTransformLayerInstruction:airMovie.transformInfo type:airMovieTo.transformInfo.transitionTypeIn transformRange:transitionRange forCompositionTrack:compositionVideoTracks[1 - index]];
+            
+            AVMutableVideoCompositionInstruction *instructionTransition = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+            instructionTransition.timeRange = transitionRange;
+            // todo:layerのカスタムがないので、arrayに追加した順にvideoが表示される。effectは各videoの設定になる。やっぱりここでlayoutInstruction設定したほうが良い
+            //instructionTransition.layerInstructions = [NSArray arrayWithObjects:layerInstructionTransitionOut, layerInstructionTransitionIn, nil];
+            instructionTransition.layerInstructions = [NSArray arrayWithObjects:layerInstructionTransitionFrom, layerInstructionTransitionTo, nil];
+            [instructions addObject:instructionTransition];
+        }
+    }
+#endif
+    
+    AVMutableVideoComposition *videoComposition = [AVMutableVideoComposition videoComposition];
+    videoComposition.renderSize = movSize;
+    //videoComposition.instructions = @[instruction];
+    videoComposition.instructions = instructions;
+    videoComposition.frameDuration = CMTimeMake(1, kVideoFPS);
+    
+    NSLog(@"moviePath:%@", moviePath);
+    NSFileManager *fm = [NSFileManager defaultManager];
+    if ([fm fileExistsAtPath:moviePath])
+    {
+        [fm removeItemAtPath:moviePath error:&error];
+    }
+    
+    // memo:simのバグ.実機ではOK
+    AVAssetExportSession *session = [[AVAssetExportSession alloc] initWithAsset:composition
+                                     //presetName:AVAssetExportPresetPassthrough];
+                                                                     presetName:AVAssetExportPresetHighestQuality];
+    
+#if false
+    // Set the desired output URL for the file created by the export process.
+    // Create a static date formatter so we only have to initialize it once.
+    static NSDateFormatter *kDateFormatter;
+    if (!kDateFormatter) {
+        kDateFormatter = [[NSDateFormatter alloc] init];
+        kDateFormatter.dateStyle = NSDateFormatterMediumStyle;
+        kDateFormatter.timeStyle = NSDateFormatterShortStyle;
+    }
+    
+    session.outputURL = [[[[NSFileManager defaultManager] URLForDirectory:NSDocumentDirectory
+                                                                 inDomain:NSUserDomainMask
+                                                        appropriateForURL:nil
+                                                                   create:@YES
+                                                                    error:nil]
+                          URLByAppendingPathComponent:[kDateFormatter stringFromDate:[NSDate date]]]
+                         URLByAppendingPathExtension:CFBridgingRelease(UTTypeCopyPreferredTagWithClass((CFStringRef)AVFileTypeQuickTimeMovie, kUTTagClassFilenameExtension))];
+#endif
+    
+    session.outputURL = [NSURL fileURLWithPath:moviePath];
+    session.outputFileType = AVFileTypeQuickTimeMovie;
+    session.shouldOptimizeForNetworkUse = YES;
+    session.videoComposition = videoComposition;
+    
+    [session exportAsynchronouslyWithCompletionHandler:^{
+#if true
+        NSLog(@"Complete export!%ld", (long)session.status);
+        if (session.status == AVAssetExportSessionStatusCompleted){
+            NSLog(@"output complete!");
+            if (_observer != nil) {
+                if ([_observer respondsToSelector:@selector(progress:inConnectingMovies:)]) {
+                    [_observer progress:100 inConnectingMovies:moviePath];
+                }
+            }
+        } else {
+            NSLog(@"output error! : %@", session.error);
+        }
+        
+#else
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (session.status == AVAssetExportSessionStatusCompleted){
+                NSLog(@"output complete!");
+                ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
+                if ([assetsLibrary videoAtPathIsCompatibleWithSavedPhotosAlbum:exporter.outputURL]) {
+                    [assetsLibrary writeVideoAtPathToSavedPhotosAlbum:exporter.outputURL completionBlock:NULL];
+                }
+            }
+        });
+#endif
+    }];
+    /*
+    AirMovie *firstAirMovie = [airMovies objectAtIndex:0];
+    
+    for (int i = 1; i < [airMovies count]; i++) {
+        AirMovie *secondAirMovie = [airMovies objectAtIndex:i];
+        
+        if (firstAirMovie == nil || secondAirMovie == nil) {
+            break;
+        }
+        
+        NSString *newMoviePath = [self connectTwoMovies:firstAirMovie secondMovie:secondAirMovie];
+        if (newMoviePath == nil) {
+            break;
+        }
+        firstAirMovie = [[AirMovie alloc] initWithPath:newMoviePath];
+    }*/
+}
+
+- (NSString*)connectTwoMovies:(AirMovie*)firstAirMovie secondMovie:(AirMovie*)secondAirMovie
+{
+    NSString *connectedMoviePath = nil;
+    
+    return connectedMoviePath;
+}
+
+- (void)connectMoviesWithPath:(NSArray*)movPathList movie:(NSString*)moviePath
 {
     NSError *error;
     
@@ -1233,7 +2049,8 @@ typedef enum {
          }
          */
         
-        AVMutableVideoCompositionLayerInstruction *layerInstruction = [self movieEffectLayerInstruction:AirMovieEffectTypeScaleDown OfTrack:videoTrack startTime:movStartTime forCompositionTrack:compositionVideoTrack];
+        //AVMutableVideoCompositionLayerInstruction *layerInstruction = [self movieEffectLayerInstruction:AirMovieEffectTypeScaleDown OfTrack:videoTrack startTime:movStartTime forCompositionTrack:compositionVideoTrack];
+        AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTrack];
         
         //[layerInstructions addObject:layerInstruction];
         
@@ -1275,7 +2092,7 @@ typedef enum {
     
     // memo:simのバグ.実機ではOK
     AVAssetExportSession *session = [[AVAssetExportSession alloc] initWithAsset:composition
-                                                                    //presetName:AVAssetExportPresetPassthrough];
+                                     //presetName:AVAssetExportPresetPassthrough];
                                                                      presetName:AVAssetExportPresetHighestQuality];
     
 #if false
@@ -1330,6 +2147,142 @@ typedef enum {
     }];
 }
 
+- (NSArray*)getVideoTrackListFromPathList:(NSArray*)pathList
+{
+    NSMutableArray *videoTrackList = [NSMutableArray array];
+    
+    for (int i = 0; i < pathList.count; i++) {
+        NSString *movPath = [pathList objectAtIndex:i];
+        AVAssetTrack *videoTrack = [self getViewTrackFromPath:movPath];
+        [videoTrackList addObject:videoTrack];
+    }
+    
+    return videoTrackList;
+}
+
+- (AVAssetTrack*)getViewTrackFromPath:(NSString*)path
+{
+    NSURL *inputURL = [NSURL fileURLWithPath:path];
+    AVURLAsset *videoAsset = [[AVURLAsset alloc] initWithURL:inputURL options:nil];
+    AVAssetTrack *videoTrack = [videoAsset tracksWithMediaType:AVMediaTypeVideo][0];
+    
+    return videoTrack;
+}
+
+- (NSArray*)movieTransitionLayerInstruction:(AirMovieTransformInfo*)movTransform  OfTrack:(AVAssetTrack*)videoTrack startTime:(CMTime)startTime forCompositionTrack:(AVAssetTrack*)compositionVideoTrack
+{
+    NSMutableArray *layerInstructions = [NSMutableArray array];
+    CGAffineTransform transform = videoTrack.preferredTransform;
+    CGAffineTransform startTransform = transform;
+    CGAffineTransform endTransform = transform;
+    
+    AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTrack];//
+    //AVMutableVideoCompositionLayerInstruction *layerInstructionIn = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTrack];//
+    //AVMutableVideoCompositionLayerInstruction *layerInstructionEffect = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTrack];
+    //AVMutableVideoCompositionLayerInstruction *layerInstructionOut = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTrack];//
+    
+    NSLog(@"transitionTypeIn:%lld", movTransform.transitionTypeIn);
+    if ((movTransform.transitionTypeIn & AirMovieTransitionTypeFade) == AirMovieTransitionTypeFade) {
+        CMTimeRange timeRange = CMTimeRangeMake(startTime, movTransform.transitionInTime);
+        [layerInstruction setOpacityRampFromStartOpacity:0 toEndOpacity:1 timeRange:timeRange];
+    }
+    
+    NSLog(@"effectType:%lld", movTransform.effectType);
+    if ((movTransform.effectType & AirMovieEffectTypeScaleUp) == AirMovieEffectTypeScaleUp) {
+        float zoomScale = movTransform.zoomScale;
+        CMTimeRange timeRange = CMTimeRangeMake(CMTimeAdd(startTime, movTransform.transitionInTime), movTransform.effectTime);
+        //startTransform = CGAffineTransformConcat(transform, CGAffineTransformMakeScale(1.0 / zoomScale, 1.0 / zoomScale));
+        //endTransform = transform;
+        startTransform = transform;
+        endTransform = CGAffineTransformConcat(transform, CGAffineTransformMakeScale(zoomScale, zoomScale));
+        [layerInstruction setTransformRampFromStartTransform:startTransform toEndTransform:endTransform timeRange:timeRange];
+    } else if ((movTransform.effectType & AirMovieEffectTypeScaleDown) == AirMovieEffectTypeScaleDown) {
+        float zoomScale = movTransform.zoomScale;
+        CMTimeRange timeRange = CMTimeRangeMake(CMTimeAdd(startTime, movTransform.transitionInTime), movTransform.effectTime);
+        //startTransform = CGAffineTransformMakeScale(zoomScale, zoomScale);
+        //startTransform = CGAffineTransformConcat(transform, CGAffineTransformMakeScale(zoomScale, zoomScale));
+        //endTransform = transform;
+        startTransform = transform;
+        endTransform = CGAffineTransformConcat(transform, CGAffineTransformMakeScale(1.0 / zoomScale, 1.0 / zoomScale));
+        [layerInstruction setTransformRampFromStartTransform:startTransform toEndTransform:endTransform timeRange:timeRange];
+    }
+    
+    NSLog(@"transitionTypeOut:%lld", movTransform.transitionTypeOut);
+    if ((movTransform.transitionTypeOut & AirMovieTransitionTypeFade) == AirMovieTransitionTypeFade) {
+        CMTimeRange timeRange = CMTimeRangeMake(CMTimeAdd(startTime, CMTimeSubtract(videoTrack.timeRange.duration, movTransform.transitionOutTime)), movTransform.transitionOutTime);
+        [layerInstruction setOpacityRampFromStartOpacity:1 toEndOpacity:0 timeRange:timeRange];
+    }
+    
+    [layerInstructions addObject:layerInstruction];
+    //[layerInstructions addObject:layerInstructionIn];
+    //[layerInstructions addObject:layerInstructionEffect];
+    //[layerInstructions addObject:layerInstructionOut];
+    
+    return layerInstructions;
+}
+
+- (AVMutableVideoCompositionLayerInstruction*)movieTransformLayerInstruction:(AirMovieTransformInfo*)transformInfo type:(AirMovieTransformType)transformType transformRange:(CMTimeRange)transformRange forCompositionTrack:(AVAssetTrack*)compositionVideoTrack
+{
+    AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTrack];
+    //CGAffineTransform transform = CGAffineTransformIdentity;
+    CGAffineTransform startTransform = transformInfo.currentTransform;
+    CGAffineTransform endTransform = transformInfo.currentTransform;
+    float startOpacity = transformInfo.currentOpcity;
+    float endOpacity = transformInfo.currentOpcity;// todo:CGAffineTransformConcat after first CGAffineTransform
+    
+    if ((transformType & AirMovieTransformTypeScaleUp) == AirMovieTransformTypeScaleUp) {
+        CGFloat zoomScale = 1.2;
+        //startTransform = CGAffineTransformMakeScale(1.0 / zoomScale, 1.0 / zoomScale);
+        //CGAffineTransform startTransform = CGAffineTransformConcat(transform, CGAffineTransformMakeScale(1.0 / zoomScale, 1.0 / zoomScale));
+        //CGAffineTransform endTransform = transform;
+        //startTransform = transform;
+        endTransform = CGAffineTransformConcat(endTransform, CGAffineTransformMakeScale(zoomScale, zoomScale));
+        //[layerInstruction setTransformRampFromStartTransform:startTransform toEndTransform:endTransform timeRange:transformRange];
+    } else if ((transformType & AirMovieTransformTypeScaleDown) == AirMovieTransformTypeScaleDown) {
+        CGFloat zoomScale = 1.2;
+        //startTransform = CGAffineTransformMakeScale(zoomScale, zoomScale);
+        //startTransform = CGAffineTransformConcat(transform, CGAffineTransformMakeScale(zoomScale, zoomScale));
+        //endTransform = transform;
+        endTransform = CGAffineTransformConcat(endTransform, CGAffineTransformMakeScale(1.0 / zoomScale, 1.0 / zoomScale));// todo:space?
+        //[layerInstruction setTransformRampFromStartTransform:startTransform toEndTransform:endTransform timeRange:transformRange];
+    }
+    
+    if ((transformType & AirMovieTransformTypeFadeIn) == AirMovieTransformTypeFadeIn) {
+        //[layerInstruction setOpacityRampFromStartOpacity:0 toEndOpacity:1 timeRange:transformRange];
+        startOpacity = 0;
+        endOpacity = 1;
+    } else if ((transformType & AirMovieTransformTypeFadeOut) == AirMovieTransformTypeFadeOut) {
+        //[layerInstruction setOpacityRampFromStartOpacity:1 toEndOpacity:0 timeRange:transformRange];
+        startOpacity = 1;
+        endOpacity = 0;
+    }
+    
+    if ((transformType & AirMovieTransformTypeRotationRight) == AirMovieTransformTypeRotationRight) {
+        
+    } else if ((transformType & AirMovieTransformTypeRotationLeft) == AirMovieTransformTypeRotationLeft) {
+        
+    }
+    
+    if ((transformType & AirMovieTransformTypeTranslationHorizontal) == AirMovieTransformTypeTranslationHorizontal) {
+        
+    } else if ((transformType & AirMovieTransformTypeTranslationVertical) == AirMovieTransformTypeTranslationVertical) {
+        
+    }
+    
+    if (transformType != AirMovieTransformTypeNone) {
+        [layerInstruction setTransformRampFromStartTransform:startTransform toEndTransform:endTransform timeRange:transformRange];
+        [layerInstruction setOpacityRampFromStartOpacity:startOpacity toEndOpacity:endOpacity timeRange:transformRange];
+    } else {
+        [layerInstruction setTransform:endTransform atTime:transformRange.start];
+        [layerInstruction setOpacity:endOpacity atTime:transformRange.start];
+    }
+    
+    transformInfo.currentTransform = endTransform;
+    transformInfo.currentOpcity = endOpacity;
+    
+    return layerInstruction;
+}
+
 - (AVMutableVideoCompositionLayerInstruction*)movieEffectLayerInstruction:(AirMovieEffectType)type OfTrack:(AVAssetTrack*)videoTrack startTime:(CMTime)startTime forCompositionTrack:(AVAssetTrack*)compositionVideoTrack
 {
     AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTrack];
@@ -1358,6 +2311,59 @@ typedef enum {
     [layerInstruction setTransformRampFromStartTransform:startTransform toEndTransform:endTransform timeRange:videoRange];
     
     return layerInstruction;
+}
+
+- (NSArray*)movieEffectLayerInstruction:(AirMovieEffectType)effectType OfTrack:(AVAssetTrack*)videoTrack startTime:(CMTime)startTime endTime:(CMTime)endTime/* transitionTime:(CMTime)transTime*/ forCompositionTrack:(AVAssetTrack*)compositionVideoTrack
+{
+    NSMutableArray *layerInstructions = [NSMutableArray array];
+    CGAffineTransform transform = videoTrack.preferredTransform;
+    CGAffineTransform startTransform = transform;
+    CGAffineTransform endTransform = transform;
+    //CMTimeRange videoRange = CMTimeRangeMake(startTime, videoTrack.timeRange.duration);
+    CMTimeRange timeRangeEffect = CMTimeRangeMake(startTime, videoTrack.timeRange.duration);
+    //CMTimeRange timeRangeEffect = CMTimeRangeMake(CMTimeAdd(startTime, transTime), CMTimeSubtract(videoTrack.timeRange.duration, CMTimeMultiply(transTime, 2)));
+    CGFloat zoomScale = 1.2;
+    
+    AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTrack];
+    if ((effectType & AirMovieEffectTypeScaleUp) == AirMovieEffectTypeScaleUp) {
+        //startTransform = CGAffineTransformMakeScale(1.0 / zoomScale, 1.0 / zoomScale);
+        startTransform = CGAffineTransformConcat(transform, CGAffineTransformMakeScale(1.0 / zoomScale, 1.0 / zoomScale));
+        endTransform = transform;
+    } else if ((effectType & AirMovieEffectTypeScaleDown) == AirMovieEffectTypeScaleDown) {
+        startTransform = CGAffineTransformMakeScale(zoomScale, zoomScale);
+        //startTransform = CGAffineTransformConcat(transform, CGAffineTransformMakeScale(zoomScale, zoomScale));
+        endTransform = transform;
+    }
+    
+    [layerInstruction setTransformRampFromStartTransform:startTransform toEndTransform:endTransform timeRange:timeRangeEffect];
+    
+    [layerInstructions addObject:layerInstruction];
+    
+    return layerInstructions;
+}
+
+- (NSArray*)movieTransitionLayerInstruction:(AirMovieTransitionType)transType OfTrackIn:(AVAssetTrack*)videoTrackIn trackOut:(AVAssetTrack*)videoTrackOut startTime:(CMTime)startTime endTime:(CMTime)endTime forCompositionTrack:(AVAssetTrack*)compositionVideoTrack
+{
+    NSMutableArray *layerInstructions = [NSMutableArray array];
+    //CGAffineTransform transform = videoTrack.preferredTransform;
+    //CGAffineTransform startTransform = transform;
+    //CGAffineTransform endTransform = transform;
+    //CMTimeRange videoRange = CMTimeRangeMake(startTime, videoTrack.timeRange.duration);
+    CMTimeRange timeRangeTrans = CMTimeRangeMake(startTime, CMTimeSubtract(endTime, startTime));
+    //CGFloat zoomScale = 1.2;
+    
+    AVMutableVideoCompositionLayerInstruction *layerInstructionIn = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTrack];//
+    AVMutableVideoCompositionLayerInstruction *layerInstructionOut = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:compositionVideoTrack];//
+
+    if ((transType & AirMovieTransitionTypeFade) == AirMovieTransitionTypeFade) {
+        [layerInstructionIn setOpacityRampFromStartOpacity:1 toEndOpacity:0 timeRange:timeRangeTrans];
+        [layerInstructionOut setOpacityRampFromStartOpacity:0 toEndOpacity:1 timeRange:timeRangeTrans];
+    }
+    
+    [layerInstructions addObject:layerInstructionOut];
+    [layerInstructions addObject:layerInstructionIn];
+    
+    return layerInstructions;
 }
 
 // fromからduration分をカット
@@ -1447,7 +2453,7 @@ typedef enum {
     }];
 }
 
-// 切り出す
+// clip:(必要な部分)切り出す/切り抜く crop:(余分な所を)切り落とす
 - (void)clipMovie:(NSString*)movPath savePath:(NSString*)savePath clipSize:(CGSize)clipSize
 {
     // 1
@@ -1494,7 +2500,7 @@ typedef enum {
     // 10
     // 切り出すサイズ
     videoSize = clipSize;
-    // 切り出す位置(元画像の原点位置を変更)
+    // 切り出す位置(画像移動/元画像の原点位置を変更。方向は逆。CGContextCTMではなく、CGAffineTransformなので、画像がマイナス方向へ移動。原点座標がプラス方向へ移動)
     transform = CGAffineTransformConcat(transform, CGAffineTransformMakeTranslation(-100, -600));
     [layerInstruction setTransform:transform atTime:kCMTimeZero];
     instruction.layerInstructions = @[layerInstruction];

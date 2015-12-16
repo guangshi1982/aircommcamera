@@ -7,7 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CoreMedia/CoreMedia.h>
+#import <UIKit/UIKit.h>
 
 @interface AirFrame : NSObject
+
+// todo:copy?
+@property (nonatomic) CVPixelBufferRef pixelBuffer;
+@property (nonatomic) CGAffineTransform transform;
+
+- (id)initWithPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform;
+- (id)initWithImage:(UIImage*)image transform:(CGAffineTransform)transform;
 
 @end

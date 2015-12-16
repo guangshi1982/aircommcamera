@@ -9,6 +9,12 @@
 #import <Foundation/Foundation.h>
 
 typedef enum {
+    AirSensorAxisX = 0,
+    AirSensorAxisY,
+    AirSensorAxisZ,
+} AirSensorAxis;
+
+typedef enum {
     AirSensorTypeNone         = 0x00,
     AirSensorTypeAcceleration = 1 << 1,
     AirSensorTypeRotationRate = 1 << 2,
@@ -133,7 +139,7 @@ typedef struct {
 // カメラでキャプチャするか。加速度/ジャイロセンサーで判断
 -(void)capture:(AirSensorInfo*)info;
 // raw info
--(void)sensorInfo:(AirSensorInfo*)info ofType:(AirSensorNotifyType)type;
+-(void)sensorInfo:(AirSensorInfo*)info ofType:(AirSensorType)type;
 
 @end
 
@@ -147,6 +153,7 @@ typedef struct {
 +(AirSensorManager*)getInstance;
 -(void)setSensorType:(AirSensorType)type;
 -(void)addSensorType:(AirSensorType)type;
+-(void)deleteSensorType:(AirSensorType)type;
 -(void)start;
 -(void)stop;
 

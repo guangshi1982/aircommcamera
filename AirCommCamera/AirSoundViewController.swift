@@ -26,20 +26,31 @@ class AirSoundViewController: AirPlayerViewController, AirShowObserver {
         self.airShowMan = AirShowManager.getInstance()
         //self.airShowMan!.observer = self
         
-        self.nextBarButtonItem.enabled = false
+        
+        self.indicatorView.hidesWhenStopped = true // not false
         //self.indicatorView.hidden = true
         //self.indicatorView.hidesWhenStopped = true // not false
         self.playButton.enabled = false
+        self.playButton.hidden = true
         self.progressView.progress = 0
     }
     
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        
+    }
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
         print("AirSoundViewController viewDidAppear")
         
-        //self.indicatorView.hidden = false
-        self.indicatorView.startAnimating()
-        //self.updateVideo()
+        self.nextBarButtonItem.enabled = false
+        self.playButton.enabled = false
+        self.playButton.hidden = true
+        self.progressView.progress = 0
+        if (self.indicatorView.isAnimating() == false) {
+            self.indicatorView.startAnimating()
+        }
     }
     
     override func viewDidDisappear(animated: Bool) {
@@ -47,6 +58,7 @@ class AirSoundViewController: AirPlayerViewController, AirShowObserver {
         
         if (self.indicatorView.isAnimating()) {
             self.indicatorView.stopAnimating()
+            self.indicatorView.hidden = true
         }
     }
 
@@ -83,10 +95,11 @@ class AirSoundViewController: AirPlayerViewController, AirShowObserver {
                 self.updateVideo()
                 self.progressView.progress = 0
                 self.nextBarButtonItem.enabled = true
-                self.playButton.enabled = true
                 if (self.indicatorView.isAnimating()) {
                     self.indicatorView.stopAnimating()
                 }
+                self.playButton.enabled = true
+                self.playButton.hidden = false
             }
         }
     }

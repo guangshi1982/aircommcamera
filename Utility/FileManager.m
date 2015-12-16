@@ -112,6 +112,13 @@ static NSString *dirPath_ = nil;
     }
 }
 
++(void)deleteFolderWithAbsolutePath:(NSString*)path
+{
+    if (path != nil) {
+        [FileManager deleteFolder:path];
+    }
+}
+
 +(NSData*)readDataFromFile:(NSString*)fileName inFolder:(NSString*)folderDir
 {
     NSData *data = nil;

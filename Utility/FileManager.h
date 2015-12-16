@@ -18,6 +18,8 @@
 +(NSString*)createSubFolder:(NSString*)subDir;
 +(void)deleteRootFolder;
 +(void)deleteSubFolder:(NSString*)subDir;
+// todo:change to sub dir
++(void)deleteFolderWithAbsolutePath:(NSString*)path;
 +(NSData*)readDataFromFile:(NSString*)fileName inFolder:(NSString*)folderDir;
 +(NSString*)readStringFromFile:(NSString*)fileName inFolder:(NSString*)folderDir;
 +(BOOL)saveData:(NSData*)data toFile:(NSString*)fileName;

@@ -15,6 +15,7 @@ import UIKit
     optional func airFileManagerViewControllerDidCancel(airFileManagerViewController: AirFileManagerViewController)
 }
 
+// Photo/FlashAir/SNS上のFileを管理??
 class AirFileManagerViewController: UIViewController {
     
     weak var delegate: AirFileManagerViewDelegate!

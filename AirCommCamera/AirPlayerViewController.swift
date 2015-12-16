@@ -89,10 +89,12 @@ class AirPlayerViewController: UIViewController, UICollectionViewDataSource, UIC
     }
     
     @IBAction func play(sender: AnyObject) {
+        print("play")
         self.player?.play()
     }
     
     private func loadAssetFromFile() {
+        print("loadAssetFromFile:\(self.videoPath)")
         let videoUrl: NSURL = NSURL.fileURLWithPath(self.videoPath!)
         let asset: AVURLAsset = AVURLAsset(URL: videoUrl)
         

@@ -8,7 +8,8 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-
+#import <CoreMedia/CoreMedia.h>
+#import "AirImage.h"
 
 typedef struct {
     CGRect bounds;
@@ -48,5 +49,12 @@ typedef struct {
 -(UIImage*)imageFilteredWithName:(NSString*)name image:(UIImage*)image;
 -(NSArray*)imagesFilteredWithNames:(NSArray*)names image:(UIImage*)image;
 -(UIImage*)resizeImageToFill:(UIImage*)orgImage bounds:(CGRect)bounds;
+-(UIImage*)resizeImage:(UIImage*)orgImage size:(CGSize)size;
+-(UIImage*)resizeImageWithSameRatio:(UIImage*)orgImage size:(CGSize)size;
+-(UIImage*)clipImage:(UIImage*)orgImage rect:(CGRect)rect;
+-(UIImage*)clipImage:(UIImage*)orgImage atOrigin:(CGPoint)origin withAspectRatio:(AirImageAspectRatio)ratio;
+-(UIImage*)clipImage:(UIImage*)orgImage atOrigin:(CGPoint)origin withSize:(AirImageSize)size;
+-(CVPixelBufferRef)pixelBufferFromImage:(UIImage*)image;
+-(CVPixelBufferRef)pixelBufferFromCGImage:(CGImageRef)image withOrientation:(UIImageOrientation)orientation size:(CGSize)size;
 
 @end

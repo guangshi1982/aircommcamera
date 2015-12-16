@@ -25,7 +25,7 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
     var airImageMan: AirImageManager?
     var progressOfProcess: Float = 0.0
     
-    var pathType: Int = 0 // TBD 0:local 1:flashair
+    var pathType: Int = 0 // TBD 0:local 1:flashair 2:image data
     
     var airProgressViewController: AirProgressViewController!
 
@@ -45,7 +45,7 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
         self.airShowMan = AirShowManager.getInstance()
         self.airShowMan!.observer = self
         
-        self.airImageMan = AirImageManager.getInstance()
+        //self.airImageMan = AirImageManager.getInstance()
         
         print("self.parentDir:\(self.parentDir)")
         
@@ -58,7 +58,7 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
                     self.airImages.append(airImage)
                 }
             }
-        } else {
+        } else if (self.pathType == 1) {
             self.airFileMan = AirFileManager.getInstance()
             let airImages: [AirImage]? = self.airFileMan?.imagesAtDirectory(self.parentDir) as? [AirImage]
             if (airImages != nil) {
@@ -77,6 +77,8 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
                     }*/
                 }
             }
+        } else if (self.pathType == 2) {
+            
         }
         
         print("self.airImages.count:\(self.airImages.count)")
@@ -117,7 +119,6 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
     override func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
         return 1
     }
-
 
     override func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.airImages.count
@@ -183,7 +184,41 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
     func progress(progress: Float, inCreatingMovies movieFile: String!, inFolder movieFolder: String!) {
         print("CreatingMovie progress:\(progress)")
         
+        /*
+        self.progress(progress, ratioOf: 1.0 / 4)
+        
+        if (progress == 100) {
+            var airMovies: [AirMovie] = []
+            let filePaths: [String]? = FileManager.getFilePathsInSubDir(movieFolder) as? [String]
+            if filePaths != nil {
+                for filePath in filePaths! {
+                    let airMovie: AirMovie = AirMovie(path: filePath)
+                    airMovies.append(airMovie)
+                }
+            }
+            self.airShowMan!.transformAirMovies(airMovies, movies: "airfolder/tmp/transform")
+        }*/
+
         self.progress(progress, ratioOf: 1.0 / 2)
+        
+        if (progress == 100) {
+            var airMovies: [AirMovie] = []
+            let moviePath = FileManager.getPathWithFileName("airmovie.mov", fromFolder: "airfolder/tmp/sound")
+            let filePaths: [String]? = FileManager.getFilePathsInSubDir(movieFolder) as? [String]
+            if filePaths != nil {
+                for filePath in filePaths! {
+                    let airMovie: AirMovie = AirMovie(path: filePath)
+                    airMovies.append(airMovie)
+                }
+            }
+            self.airShowMan!.connectAirMovies(airMovies, movie: moviePath)
+        }
+    }
+    
+    func progress(progress: Float, inTransformingMovies movieFile: String!, inFolder movieFolder: String!) {
+        print("TransformingMovie progress:\(progress)")
+        
+        self.progress(progress, ratioOf: 1.0 / 4)
         
         if (progress == 100) {
             var airMovies: [AirMovie] = []
@@ -230,11 +265,15 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
             FileManager.copyFromPath("airfolder/tmp", toPath: dstPath)
             
             // unwind
-            [self.performSegueWithIdentifier(self.identifierAirShowCollectionViewController, sender: dstPath)]
-            self.dismissViewControllerAnimated(true, completion: { () -> Void in
-                print("dismissAirProgressViewController")
-                }
-            )
+            dispatch_async(dispatch_get_main_queue()) {
+                self.dismissViewControllerAnimated(true, completion: { () -> Void in
+                    print("dismissAirProgressViewController")
+                    // todo:progress画面が表示されるのが原因？で追加されたShowが表示されない。
+                    // 実際見えないが、LocalCameraが表示されるな(viewWillAppearなど).unwindでshow一覧画面に戻るので、途中で自動的にImage一覧画面が消え、LocalCamera画面が表示されたかも。ただすぐLocalCamera画面も破棄されshow一覧が表示される(新規showはすでに追加されている)
+                    self.performSegueWithIdentifier(self.identifierAirShowCollectionViewController, sender: dstPath)
+                    }
+                )
+            }
         }
     }
     
@@ -260,7 +299,8 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
         FileManager.deleteSubFolder("airfolder/tmp")
         FileManager.createSubFolder("airfolder/tmp/image/before")// original images
         FileManager.createSubFolder("airfolder/tmp/image/after")// for effect
-        FileManager.createSubFolder("airfolder/tmp/movie") // transition or none (from images with effect). And connected movie named [airmovie.xxx]
+        FileManager.createSubFolder("airfolder/tmp/movie") // none effect(from images with ). And connected movie named [airmovie.xxx]
+        FileManager.createSubFolder("airfolder/tmp/transform") // transition
         FileManager.createSubFolder("airfolder/tmp/sound") // connected movie from movies (no sound)
         FileManager.createSubFolder("airfolder/tmp/show")
         
@@ -277,6 +317,8 @@ class AirImageCollectionViewController: UICollectionViewController, UICollection
             self.performSegueWithIdentifier(self.identifierAirLocalCameraViewController, sender: nil)
         } else if (self.pathType == 1) {
             self.performSegueWithIdentifier(self.identifierAirCameraViewController, sender: nil)
+        } else if (self.pathType == 2) {
+            self.performSegueWithIdentifier(self.identifierAirShowCollectionViewController, sender: nil)
         }
     }
     

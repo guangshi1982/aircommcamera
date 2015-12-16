@@ -23,8 +23,10 @@ class AirMovieCollectionViewController: UIViewController, UICollectionViewDelega
     var airShowMan: AirShowManager?
     // todo:after?
     var airMovieFlolder: String?
+    var tmpAirMovies: [AirMovie] = []
     var airMovies: [AirMovie] = []
     var seletectPath: NSIndexPath?
+    var progressOfProcess: Float = 0.0
     
     // todo: create queue in AirShowManager?
     var movieQueue: dispatch_queue_t?
@@ -54,13 +56,14 @@ class AirMovieCollectionViewController: UIViewController, UICollectionViewDelega
         super.viewWillAppear(animated)
         
         // 作成されたタイミングで随時追加
+        /*
         let filePaths: [String]? = FileManager.getFilePathsInSubDir(self.airMovieFlolder) as? [String]
         if filePaths != nil {
             for filePath in filePaths! {
                 let airMovie: AirMovie = AirMovie(path: filePath)
                 self.airMovies.append(airMovie)
             }
-        }
+        }*/
     }
 
     override func didReceiveMemoryWarning() {
@@ -111,7 +114,7 @@ class AirMovieCollectionViewController: UIViewController, UICollectionViewDelega
     
         // Configure the cell
         let airMovie = self.airMovies[indexPath.row]
-        let thumbnail: UIImage? = self.airShowMan!.thumbnailOfVideo(airMovie.filePath)
+        let thumbnail: UIImage? = self.airShowMan!.thumbnailOfVideo(airMovie.filePath, withSize: (cell.thumbnailImageView?.bounds.size)!)
         if (thumbnail != nil) {
             cell.thumbnailImageView?.image = thumbnail
             cell.moviePath = airMovie.filePath
@@ -160,14 +163,47 @@ class AirMovieCollectionViewController: UIViewController, UICollectionViewDelega
         let airMovie: AirMovie = AirMovie(path: movieFile)
         self.airMovies.append(airMovie)
         let indexPath = NSIndexPath(forItem: self.airMovies.count - 1, inSection: 0)
+        self.progress(progress, ratioOf: 1)
         
-        dispatch_sync(dispatch_get_main_queue()) { () -> Void in
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
             self.airMovieCollectionView.insertItemsAtIndexPaths([indexPath])
-            self.progressView.progress = progress
             // todo:scroll to new movie
             
             if (progress == 100) {
-                self.progressView.progress = 0.0
+                //self.progressView.progress = 0.0
+                self.progressView.hidden = true
+                self.nextBarButtonItem.enabled = true
+                // todo:scroll to first?
+                
+                self.airShowMan?.observer = nil
+            }
+        }
+        
+        /*
+        let airMovie: AirMovie = AirMovie(path: movieFile)
+        self.tmpAirMovies.append(airMovie)
+        self.progress(progress, ratioOf: 1.0 / 2)
+        
+        if (progress == 100) {
+            self.airShowMan!.transformAirMovies(self.tmpAirMovies, movies: "airfolder/tmp/transform")
+        }*/
+    }
+    
+    func progress(progress: Float, inTransformingMovies movieFile: String!, inFolder movieFolder: String!) {
+        print("TransformingMovie progress:\(progress)")
+        
+        let airMovie: AirMovie = AirMovie(path: movieFile)
+        self.airMovies.append(airMovie)
+        let indexPath = NSIndexPath(forItem: self.airMovies.count - 1, inSection: 0)
+        self.progress(progress, ratioOf: 1.0 / 2)
+        
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            self.airMovieCollectionView.insertItemsAtIndexPaths([indexPath])
+            // todo:scroll to new movie
+            
+            if (progress == 100) {
+                //self.progressView.progress = 0.0
+                self.progressView.hidden = true
                 self.nextBarButtonItem.enabled = true
                 // todo:scroll to first?
                 
@@ -186,13 +222,24 @@ class AirMovieCollectionViewController: UIViewController, UICollectionViewDelega
         }
     }*/
     
+    private func progress(progress: Float, ratioOf ratio: Float) {
+        let progressOfAll = self.progressOfProcess + progress * ratio
+        
+        if (progress == 100) {
+            self.progressOfProcess = progressOfAll
+        }
+        
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            self.progressView.progress = progressOfAll / 100.0
+        }
+    }
+    
     // MARK: Action
     
     @IBAction func nextAction(sender: AnyObject) {
-        /*
         let moviePath = FileManager.getPathWithFileName("airmovie.mov", fromFolder: "airfolder/tmp/sound")
-        self.airShowMan!.connectAirMovies(self.airMovies, movie: moviePath)*/
-        [self.performSegueWithIdentifier(self.identifierAirSoundViewController, sender: "airfolder/tmp/sound")]
+        /*self.airShowMan!.connectAirMovies(self.airMovies, movie: moviePath)*/
+        self.performSegueWithIdentifier(self.identifierAirSoundViewController, sender: moviePath)
     }
     
     @IBAction func addAction(sender: AnyObject) {

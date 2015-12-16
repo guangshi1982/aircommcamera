@@ -13,7 +13,7 @@
 #import "Log.h"
 
 
-#define FREQUENCY 5.0
+#define FREQUENCY 60.0
 
 @implementation AirSensorAcceleration
 
@@ -145,20 +145,26 @@
     return self;
 }
 
--(void)notifySensorInfo:(AirSensorNotifyType)type
+-(void)notifySensorInfo:(AirSensorType)type
 {
     //DEBUGLOG_PRINTF(@"notifySensorInfo");
     
-    if (_observer != nil) {
-        if ([_observer respondsToSelector:@selector(sensorInfo:ofType:)]) {
+    //if (_observer != nil) {
+    //    if ([_observer respondsToSelector:@selector(sensorInfo:ofType:)]) {
             [_observer sensorInfo:_info ofType:type];
-        }
-    }
+    //    }
+    //}
 }
 
 -(void)proximityStateDidChange:(NSNotification*)notification
 {
     //DEBUGLOG_PRINTF(@"proximityStateDidChange");
+    BOOL state = [UIDevice currentDevice].proximityState;// YES:proximity NO:other
+    if (_observer != nil) {
+        if ([_observer respondsToSelector:@selector(displayCameraView:info:)]) {
+            [_observer displayCameraView:state info:_info];
+        }
+    }
 }
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading
@@ -167,7 +173,7 @@
     
     _info.rawInfo.location.magneticHeading = newHeading.magneticHeading;// 磁北
     _info.rawInfo.location.trueHeading = newHeading.trueHeading;// 真北
-    [self notifySensorInfo:AirSensorNotifyTypeLocationHeading];
+    [self notifySensorInfo:AirSensorTypeHeading];
 }
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
@@ -180,7 +186,7 @@
         _info.rawInfo.location.latitude = currentLocation.coordinate.latitude;
         _info.rawInfo.location.longitude = currentLocation.coordinate.longitude;
         
-        [self notifySensorInfo:AirSensorNotifyTypeLocationCoordinate];
+        [self notifySensorInfo:AirSensorTypeLocation];
     }
 }
 
@@ -189,6 +195,7 @@
     
 }
 
+// todo:起動後変更できないな(指定されていないセンサーを停止する必要がある)。下同。起動時と起動中分ける？
 -(void)setSensorType:(AirSensorType)type
 {
     _activeSensorType = type;
@@ -199,8 +206,14 @@
     _activeSensorType |= type;
 }
 
+-(void)deleteSensorType:(AirSensorType)type
+{
+    _activeSensorType &= ~type;
+}
+
 // todo:すべてcurrentQueueにすると、キューにたまるので、リアルタイムにならない可能性がある
-// todo:許可処理
+// todo:全部Motionから取得する。別々に通知するのではなく、まとめて一緒に通知
+// todo:許可処理->OK(一応追加)
 -(void)start
 {
     if ((_activeSensorType & AirSensorTypeProximity) == AirSensorTypeProximity) {
@@ -257,12 +270,12 @@
         
         CMAccelerometerHandler handler = ^(CMAccelerometerData *data, NSError *error) {
             //DEBUGLOG_PRINTF(@"CMAccelerometerHandler");
-            
+            //NSLog(@"Accelerometer time:%f", data.timestamp);
             _info.rawInfo.acceleration.x = data.acceleration.x;
             _info.rawInfo.acceleration.y = data.acceleration.y;
             _info.rawInfo.acceleration.z = data.acceleration.z;
             
-            [self notifySensorInfo:AirSensorNotifyTypeAcceleration];
+            [self notifySensorInfo:AirSensorTypeAcceleration];
         };
         
         [_motionMan startAccelerometerUpdatesToQueue:[NSOperationQueue currentQueue] withHandler:handler];
@@ -279,7 +292,7 @@
             _info.rawInfo.rotation.y = data.rotationRate.y;
             _info.rawInfo.rotation.z = data.rotationRate.z;
             
-            [self notifySensorInfo:AirSensorNotifyTypeRotationRate];
+            [self notifySensorInfo:AirSensorTypeGyro];
         };
         
         [_motionMan startGyroUpdatesToQueue:[NSOperationQueue currentQueue] withHandler:handler];
@@ -297,7 +310,7 @@
             _info.rawInfo.rotation.roll = data.attitude.roll;
             _info.rawInfo.rotation.yaw = data.attitude.yaw;
             
-            [self notifySensorInfo:AirSensorNotifyTypeRotationRate];
+            [self notifySensorInfo:AirSensorTypeAttitude];
         };
         
         [_motionMan startDeviceMotionUpdatesToQueue:[NSOperationQueue currentQueue] withHandler:handler];
@@ -314,7 +327,7 @@
             _info.rawInfo.location.headingY = data.magneticField.y;
             _info.rawInfo.location.headingZ = data.magneticField.z;
             
-            [self notifySensorInfo:AirSensorNotifyTypeLocationHeading];
+            [self notifySensorInfo:AirSensorTypeMagnetometer];
         };
         
         [_motionMan startMagnetometerUpdatesToQueue:[NSOperationQueue currentQueue] withHandler:handler];
@@ -333,7 +346,7 @@
             _info.rawInfo.activity.automotive = activity.automotive;
             _info.rawInfo.activity.cycling = activity.cycling;
             
-            [self notifySensorInfo:AirSensorNotifyTypeActivity];
+            [self notifySensorInfo:AirSensorTypeActivity];
         };
         
         [_activityMan startActivityUpdatesToQueue:[NSOperationQueue currentQueue] withHandler:handler];

@@ -7,7 +7,33 @@
 //
 
 #import "AirFrame.h"
+#import "AirImageManager.h"
+
+@interface AirFrame()
+
+@end
 
 @implementation AirFrame
+
+- (id)initWithPixelBuffer:(CVPixelBufferRef)pixelBuffer transform:(CGAffineTransform)transform
+{
+    if (self = [super init]) {
+        _pixelBuffer = pixelBuffer;
+        _transform = transform;
+    }
+    
+    return self;
+}
+
+- (id)initWithImage:(UIImage*)image transform:(CGAffineTransform)transform
+{
+    if (self = [super init]) {
+        AirImageManager *airImageMan = [AirImageManager getInstance];
+        _pixelBuffer = [airImageMan pixelBufferFromImage:image];
+        _transform = transform;
+    }
+
+    return self;
+}
 
 @end

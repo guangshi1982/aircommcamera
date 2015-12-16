@@ -7,6 +7,7 @@
 //
 
 #import "AirImage.h"
+#import "AirFileManager.h"
 
 
 @implementation AirImageExif
@@ -19,7 +20,13 @@
 - (id)initWithItem:(FAItem *)item
 {
     if (self = [super initWithItem:item]) {
-        _image = [UIImage imageNamed:self.filePath];
+        NSData *data = [[AirFileManager getInstance] getFileData:self.filePath];
+        //_image = [UIImage imageNamed:self.filePath];
+        if (data) {
+            _image = [UIImage imageWithData:data];
+        } else {
+            // todo: dummy data
+        }
     }
     
     return self;
@@ -38,6 +45,15 @@
 {
     if (self = [super init]) {
         _image = image;
+    }
+    
+    return self;
+}
+
+- (id)initWithData:(NSData*)data
+{
+    if (self = [super init]) {
+        _image = [UIImage imageWithData:data];
     }
     
     return self;

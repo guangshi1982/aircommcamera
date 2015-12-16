@@ -5,6 +5,7 @@
 #import "AirShowPlayerViewController.h"
 #import <QBImagePickerController/QBImagePickerController.h>
 #import <MBCircularProgressBar/MBCircularProgressBarView.h>
+#import <CorePlot/CorePlot-CocoaTouch.h>
 #import "AirImageManager.h"
 #import "AirShowManager.h"
 #import "AirFileManager.h"
@@ -20,4 +21,5 @@
 #import "FAItem.h"
 #import "Uploader.h"
 #import "FileManager.h"
+#import "AirGraphView.h"
 #import "Log.h"

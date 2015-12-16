@@ -196,7 +196,7 @@ class AirImageSelectedViewController: UIViewController, UICollectionViewDelegate
         }*/
         
         // todo: in storyborad?
-        [self.performSegueWithIdentifier(self.identifierAirMovieCollectionViewController, sender: "airfolder/tmp/movie")]
+        self.performSegueWithIdentifier(self.identifierAirMovieCollectionViewController, sender: "airfolder/tmp/movie")
     }
     
     @IBAction func addAction(sender: AnyObject) {
